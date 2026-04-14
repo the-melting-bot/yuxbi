@@ -1,14 +1,48 @@
 <script lang="ts">
+  import { getCursor } from '$lib/motion/cursor';
+
   let sectionEl: HTMLElement;
   let visible = $state(false);
+  let cardOffsets = $state([
+    { x: 0, y: 0 },
+    { x: 0, y: 0 },
+    { x: 0, y: 0 }
+  ]);
 
   $effect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) visible = true; },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
     if (sectionEl) observer.observe(sectionEl);
-    return () => observer.disconnect();
+
+    let rafId: number;
+    function tick() {
+      const cursor = getCursor();
+      if (cursor.active && sectionEl) {
+        const rect = sectionEl.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          const cx = (cursor.x - rect.left) / rect.width - 0.5;
+          const cy = (cursor.y - rect.top) / rect.height - 0.5;
+          // Each card reacts differently
+          for (let i = 0; i < 3; i++) {
+            const multiplier = (i + 1) * 3;
+            const dir = i % 2 === 0 ? 1 : -1;
+            cardOffsets[i] = {
+              x: cardOffsets[i].x + (cx * multiplier * dir - cardOffsets[i].x) * 0.04,
+              y: cardOffsets[i].y + (cy * multiplier - cardOffsets[i].y) * 0.04
+            };
+          }
+        }
+      }
+      rafId = requestAnimationFrame(tick);
+    }
+    tick();
+
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(rafId);
+    };
   });
 </script>
 
@@ -23,18 +57,24 @@
       <h2 class="about-headline">Not a portfolio. Not a SaaS page. Not a normal anything.</h2>
 
       <div class="about-grid">
-        <div class="about-card">
-          <div class="card-icon">⬡</div>
-          <p>Yuxbi is a weird-product lab. A home for strange digital experiments that do one thing, and do it well.</p>
-        </div>
-        <div class="about-card">
-          <div class="card-icon">◇</div>
-          <p>Every experiment starts as an idea too odd for a normal product roadmap. Here, that is the roadmap.</p>
-        </div>
-        <div class="about-card">
-          <div class="card-icon">△</div>
-          <p>Clean execution. Strange purpose. Each tool is a small, polished artifact designed to be useful in unexpected ways.</p>
-        </div>
+        {#each [
+          { icon: '⬡', text: 'Yuxbi is a weird-product lab. A home for strange digital experiments that do one thing, and do it well.' },
+          { icon: '◇', text: 'Every experiment starts as an idea too odd for a normal product roadmap. Here, that is the roadmap.' },
+          { icon: '△', text: 'Clean execution. Strange purpose. Each tool is a small, polished artifact designed to be useful in unexpected ways.' }
+        ] as card, i}
+          <div
+            class="about-card"
+            style="
+              transform: translate({cardOffsets[i].x}px, {cardOffsets[i].y}px);
+              animation-delay: {i * 0.1}s;
+            "
+          >
+            <div class="card-icon-wrapper">
+              <span class="card-icon">{card.icon}</span>
+            </div>
+            <p>{card.text}</p>
+          </div>
+        {/each}
       </div>
     </div>
   </div>
@@ -49,7 +89,7 @@
   .about-inner {
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+    transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
   }
 
   .about-inner.visible {
@@ -93,22 +133,43 @@
   .about-card {
     padding: var(--space-8);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     background: var(--color-surface);
-    transition: border-color var(--transition-interactive),
-                box-shadow var(--transition-interactive);
+    will-change: transform;
+    transition:
+      border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: aboutFloat 7s ease-in-out infinite;
+  }
+
+  @keyframes aboutFloat {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -5px; }
   }
 
   .about-card:hover {
-    border-color: rgba(80, 200, 220, 0.2);
-    box-shadow: var(--shadow-glow);
+    border-color: rgba(80, 200, 220, 0.25);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.3),
+      0 0 30px rgba(80, 200, 220, 0.05);
+  }
+
+  .card-icon-wrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background: rgba(80, 200, 220, 0.06);
+    border: 1px solid rgba(80, 200, 220, 0.1);
+    margin-bottom: var(--space-5);
   }
 
   .card-icon {
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
     color: var(--color-accent);
-    margin-bottom: var(--space-4);
-    opacity: 0.6;
+    opacity: 0.7;
   }
 
   .about-card p {
@@ -120,6 +181,16 @@
   @media (max-width: 768px) {
     .about-grid {
       grid-template-columns: 1fr;
+    }
+    .about-card {
+      animation: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-card {
+      animation: none !important;
+      transform: none !important;
     }
   }
 </style>

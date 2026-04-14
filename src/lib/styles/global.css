@@ -1,6 +1,7 @@
 /* ===================================
    YUXBI — Global Design System
-   A dark cosmic laboratory aesthetic
+   Antigravity Lab Aesthetic
+   Kinetic · Elastic · Alive
    =================================== */
 
 /* --- Font Loading --- */
@@ -80,6 +81,7 @@
   --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
@@ -229,23 +231,7 @@ a, button, [role='button'] {
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.025;
+  opacity: 0.02;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   background-repeat: repeat;
-}
-
-/* --- Scanline Effect (subtle) --- */
-.scanlines::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9998;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
 }

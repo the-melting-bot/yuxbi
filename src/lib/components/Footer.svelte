@@ -108,11 +108,13 @@
     font-size: var(--text-sm);
     color: var(--color-text-muted);
     text-decoration: none;
-    transition: color var(--transition-interactive);
+    transition: color 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: inline-block;
   }
 
   a.footer-link:hover {
     color: var(--color-accent);
+    transform: translateX(3px);
   }
 
   .footer-link--muted {
@@ -139,7 +141,7 @@
   .footer-attrib-link {
     color: var(--color-text-muted);
     text-decoration: none;
-    transition: color var(--transition-interactive);
+    transition: color 0.3s ease;
   }
 
   .footer-attrib-link:hover {

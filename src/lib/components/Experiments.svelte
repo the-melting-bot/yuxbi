@@ -23,6 +23,7 @@
         <span>FEATURED EXPERIMENTS</span>
       </div>
       <h2 class="section-title">Strange tools. Clean builds. Each one does exactly one thing.</h2>
+      <p class="section-sub">Hover to examine. Click anywhere in the hero to leave your mark.</p>
     </div>
 
     <div class="experiments-grid" class:visible role="list">
@@ -75,6 +76,12 @@
     color: var(--color-text-bright);
     max-width: 640px;
     letter-spacing: -0.01em;
+    margin-bottom: var(--space-3);
+  }
+
+  .section-sub {
+    font-size: var(--text-sm);
+    color: var(--color-text-faint);
   }
 
   .experiments-grid {

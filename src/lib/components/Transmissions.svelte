@@ -3,15 +3,8 @@
 
   let sectionEl: HTMLElement;
   let visible = $state(false);
-
-  $effect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) visible = true; },
-      { threshold: 0.15 }
-    );
-    if (sectionEl) observer.observe(sectionEl);
-    return () => observer.disconnect();
-  });
+  let activeIndex = $state(-1);
+  let scanPosition = $state(0);
 
   const typeIcons: Record<string, string> = {
     log: '▸',
@@ -19,14 +12,57 @@
     note: '▹',
     alert: '◆'
   };
+
+  $effect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          visible = true;
+          startScanAnimation();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    if (sectionEl) observer.observe(sectionEl);
+
+    return () => observer.disconnect();
+  });
+
+  function startScanAnimation() {
+    // Stagger reveal each transmission entry
+    let i = 0;
+    function revealNext() {
+      if (i < transmissions.length) {
+        activeIndex = i;
+        i++;
+        setTimeout(revealNext, 200);
+      }
+    }
+    setTimeout(revealNext, 400);
+
+    // Continuous scan line
+    let scanRaf: number;
+    function animateScan() {
+      scanPosition = (scanPosition + 0.3) % 100;
+      scanRaf = requestAnimationFrame(animateScan);
+    }
+    animateScan();
+  }
 </script>
 
 <section class="transmissions section-padding" id="transmissions" bind:this={sectionEl}>
+  <!-- Scan line effect -->
+  <div class="scan-line" style="top: {scanPosition}%" aria-hidden="true"></div>
+
   <div class="container">
     <div class="section-header" class:visible>
       <div class="section-label">
         <span class="label-marker">◎</span>
         <span>TRANSMISSION FEED</span>
+        <span class="live-indicator">
+          <span class="live-dot"></span>
+          LIVE
+        </span>
       </div>
       <h2 class="section-title">Recovered signals from the lab.</h2>
       <p class="section-sub">Intercepted notes, field reports, and operational logs.</p>
@@ -34,11 +70,17 @@
 
     <div class="feed" class:visible role="list">
       {#each transmissions as tx, i}
-        <article class="tx-entry" style="animation-delay: {i * 100}ms" role="listitem">
+        <article
+          class="tx-entry"
+          class:revealed={i <= activeIndex}
+          role="listitem"
+        >
           <div class="tx-timeline">
-            <div class="tx-dot"></div>
+            <div class="tx-dot" class:active={i <= activeIndex}>
+              <span class="tx-ping" class:active={i === activeIndex}></span>
+            </div>
             {#if i < transmissions.length - 1}
-              <div class="tx-line"></div>
+              <div class="tx-line" class:active={i < activeIndex}></div>
             {/if}
           </div>
 
@@ -66,6 +108,25 @@
   .transmissions {
     position: relative;
     background: var(--color-surface);
+    overflow: hidden;
+  }
+
+  /* Scanning line */
+  .scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(80, 200, 220, 0.15) 20%,
+      rgba(80, 200, 220, 0.3) 50%,
+      rgba(80, 200, 220, 0.15) 80%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+    box-shadow: 0 0 20px rgba(80, 200, 220, 0.08);
   }
 
   .section-header {
@@ -97,6 +158,32 @@
     opacity: 0.6;
   }
 
+  .live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-left: var(--space-4);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: rgba(80, 200, 220, 0.08);
+    border: 1px solid rgba(80, 200, 220, 0.15);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+  }
+
+  .live-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    animation: livePulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes livePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
   .section-title {
     font-family: var(--font-display);
     font-size: var(--text-2xl);
@@ -126,6 +213,14 @@
     display: flex;
     gap: var(--space-6);
     padding-bottom: var(--space-8);
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .tx-entry.revealed {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .tx-timeline {
@@ -137,20 +232,49 @@
   }
 
   .tx-dot {
+    position: relative;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--color-accent-dim);
+    background: var(--color-border);
     border: 2px solid var(--color-surface);
-    box-shadow: 0 0 8px rgba(80, 200, 220, 0.3);
     flex-shrink: 0;
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+  }
+
+  .tx-dot.active {
+    background: var(--color-accent);
+    box-shadow: 0 0 10px rgba(80, 200, 220, 0.4);
+  }
+
+  .tx-ping {
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid var(--color-accent);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .tx-ping.active {
+    animation: pingExpand 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes pingExpand {
+    0% { transform: scale(0.5); opacity: 0.8; }
+    100% { transform: scale(2.5); opacity: 0; }
   }
 
   .tx-line {
     width: 1px;
     flex: 1;
-    background: linear-gradient(to bottom, var(--color-border), transparent);
+    background: var(--color-border);
     margin-top: var(--space-2);
+    transition: background 0.4s ease;
+  }
+
+  .tx-line.active {
+    background: linear-gradient(to bottom, rgba(80, 200, 220, 0.3), var(--color-border));
   }
 
   .tx-content {
@@ -218,6 +342,27 @@
     .tx-entry {
       padding-left: var(--space-4);
       border-left: 1px solid var(--color-border);
+    }
+
+    .tx-entry.revealed {
+      border-left-color: rgba(80, 200, 220, 0.2);
+    }
+
+    .scan-line {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tx-entry {
+      opacity: 1;
+      transform: none;
+    }
+    .scan-line {
+      display: none;
+    }
+    .tx-ping {
+      animation: none !important;
     }
   }
 </style>
