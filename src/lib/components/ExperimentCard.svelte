@@ -4,9 +4,10 @@
   interface Props {
     experiment: Experiment;
     index: number;
+    onShelf: boolean;
   }
 
-  let { experiment, index }: Props = $props();
+  let { experiment, index, onShelf }: Props = $props();
 
   const statusMap = {
     active: { label: 'Active', class: 'status-active' },
@@ -25,6 +26,16 @@
   let isHovered = $state(false);
   let floatY = $state(0);
   let rotate = $state(0);
+  let settled = $state(false);
+
+  $effect(() => {
+    if (!onShelf || settled) return;
+    const timer = setTimeout(() => {
+      settled = true;
+    }, 600 + index * 80);
+
+    return () => clearTimeout(timer);
+  });
 
   // Smooth tilt with spring physics
   let targetTiltX = 0;
@@ -99,6 +110,8 @@
     --glow-y: {glowY}%;
   "
   class:hovered={isHovered}
+  class:on-shelf={onShelf}
+  class:settled={settled}
   onmousemove={onMouseMove}
   onmouseenter={onMouseEnter}
   onmouseleave={onMouseLeave}
@@ -184,10 +197,24 @@
       box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
       border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
       background 0.4s ease;
-    /* Staggered float animation */
-    animation: cardFloat calc(6s + var(--index) * 0.5s) ease-in-out infinite;
-    animation-delay: calc(var(--index) * -0.8s);
     transform-origin: center 70%;
+  }
+
+  .experiment-card.on-shelf {
+    animation: shelfSettle 0.7s var(--ease-elastic) both;
+    animation-delay: calc(var(--index) * 80ms);
+  }
+
+  .experiment-card.on-shelf.settled {
+    animation: cardFloat calc(7s + var(--index) * 0.45s) ease-in-out infinite;
+    animation-delay: calc(var(--index) * -0.7s);
+  }
+
+  @keyframes shelfSettle {
+    0% { translate: 0 18px; }
+    55% { translate: 0 -6px; }
+    78% { translate: 0 3px; }
+    100% { translate: 0 0; }
   }
 
   @keyframes cardFloat {

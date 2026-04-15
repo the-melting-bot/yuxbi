@@ -52,6 +52,7 @@
       <div class="about-label">
         <span class="label-marker">◆</span>
         <span>WHAT THIS IS</span>
+        <span class="label-doodle" aria-hidden="true">~◌~</span>
       </div>
 
       <h2 class="about-headline">Not a portfolio. Not a SaaS page. Not a normal anything.</h2>
@@ -107,6 +108,13 @@
     letter-spacing: 0.15em;
     text-transform: uppercase;
     margin-bottom: var(--space-8);
+  }
+
+  .label-doodle {
+    color: var(--color-secondary);
+    letter-spacing: 0.02em;
+    font-size: 0.85rem;
+    opacity: 0.75;
   }
 
   .label-marker {

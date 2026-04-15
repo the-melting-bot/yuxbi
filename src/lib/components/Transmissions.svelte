@@ -59,6 +59,7 @@
       <div class="section-label">
         <span class="label-marker">◎</span>
         <span>TRANSMISSION FEED</span>
+        <span class="label-doodle" aria-hidden="true">////</span>
         <span class="live-indicator">
           <span class="live-dot"></span>
           LIVE
@@ -152,6 +153,13 @@
     letter-spacing: 0.15em;
     text-transform: uppercase;
     margin-bottom: var(--space-6);
+  }
+
+  .label-doodle {
+    color: var(--color-secondary-dim);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
   }
 
   .label-marker {

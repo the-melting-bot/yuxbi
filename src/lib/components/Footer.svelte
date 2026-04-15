@@ -35,9 +35,22 @@
 
     <div class="footer-bottom">
       <span class="footer-copy">© {year} Yuxbi</span>
-      <span class="footer-attribution">
-        Built by <a href="https://themeltingbot.com" class="footer-attrib-link" target="_blank" rel="noopener noreferrer">The Melting Bot</a>
-      </span>
+      <a href="https://themeltingbot.com" class="tmb-pill" target="_blank" rel="noopener noreferrer" aria-label="Built by The Melting Bot">
+        <svg class="tmb-pill-icon" width="18" height="20" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <line x1="12" y1="3" x2="12" y2="0" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="0" r="1.5" fill="#7B61FF"/>
+          <rect x="1" y="3" width="22" height="16" rx="4" stroke="#3568EB" stroke-width="1.8" fill="none"/>
+          <circle cx="8" cy="10" r="2.5" fill="#3568EB"/>
+          <circle cx="16" cy="10" r="2.5" fill="#3568EB"/>
+          <circle cx="8" cy="10" r="1" fill="#0D0D0D"/>
+          <circle cx="16" cy="10" r="1" fill="#0D0D0D"/>
+          <path d="M6 15 Q12 19 18 15" stroke="#3568EB" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M5 19 L5 24 Q5 26 7 26" stroke="#7B61FF" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+          <path d="M11 19 L11 27 Q11 29 13 29 Q15 29 15 27 L15 23" stroke="#7B61FF" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+          <path d="M19 19 L19 23 Q19 25 21 25" stroke="#7B61FF" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+        <span>Built by The Melting Bot</span>
+      </a>
     </div>
   </div>
 </footer>
@@ -134,19 +147,36 @@
     color: var(--color-text-faint);
   }
 
-  .footer-attribution {
-    font-size: var(--text-xs);
-    color: var(--color-text-faint);
-  }
-
-  .footer-attrib-link {
+  .tmb-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 2px solid rgba(31, 47, 86, 0.2);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 0 rgba(31, 47, 86, 0.12);
     color: var(--color-text-muted);
+    font-size: var(--text-xs);
     text-decoration: none;
-    transition: color 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: transform 0.25s var(--ease-elastic), box-shadow 0.25s ease, border-color 0.25s ease;
   }
 
-  .footer-attrib-link:hover {
-    color: var(--color-accent);
+  .tmb-pill:hover {
+    transform: translateY(-2px) rotate(-1deg);
+    box-shadow: 0 6px 0 rgba(31, 47, 86, 0.14);
+    border-color: rgba(53, 104, 235, 0.35);
+  }
+
+  .tmb-pill:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 0 rgba(31, 47, 86, 0.14);
+  }
+
+  .tmb-pill-icon {
+    flex-shrink: 0;
   }
 
   @media (max-width: 640px) {

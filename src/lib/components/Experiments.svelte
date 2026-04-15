@@ -30,10 +30,12 @@
       <div class="shelf-rail shelf-rail-top" aria-hidden="true"></div>
       <div class="experiments-grid" role="list">
       {#each experiments as experiment, i}
-        <ExperimentCard {experiment} index={i} />
+        <ExperimentCard {experiment} index={i} onShelf={visible} />
       {/each}
       </div>
       <div class="shelf-rail shelf-rail-bottom" aria-hidden="true"></div>
+      <div class="shelf-doodle shelf-doodle-left" aria-hidden="true">✦</div>
+      <div class="shelf-doodle shelf-doodle-right" aria-hidden="true">✷</div>
     </div>
   </div>
 </section>
@@ -122,6 +124,24 @@
 
   .shelf-rail-bottom {
     bottom: -12px;
+  }
+
+  .shelf-doodle {
+    position: absolute;
+    top: -30px;
+    font-size: 1.2rem;
+    color: var(--color-secondary);
+    text-shadow: 0 3px 0 rgba(31, 47, 86, 0.12);
+    rotate: -10deg;
+  }
+
+  .shelf-doodle-left {
+    left: 8px;
+  }
+
+  .shelf-doodle-right {
+    right: 10px;
+    rotate: 8deg;
   }
 
   .experiments-grid {
