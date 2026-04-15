@@ -51,36 +51,35 @@
     </div>
 
     <div class="footer-bottom">
-      <span class="footer-copy">© {year} Yuxbi</span>
-      <div class="footer-right">
-        <div class="cheat-console" role="group" aria-label="Alien mode cheat controller">
-          <p class="cheat-title">Enter Yuxbi Cheat Code</p>
-          <div class="controller-row">
-            <div class="dpad">
-              <button class="ctrl up" onclick={() => pressCheat('up')} aria-label="Up">▲</button>
-              <button class="ctrl left" onclick={() => pressCheat('left')} aria-label="Left">◀</button>
-              <button class="ctrl right" onclick={() => pressCheat('right')} aria-label="Right">▶</button>
-              <button class="ctrl down" onclick={() => pressCheat('down')} aria-label="Down">▼</button>
-            </div>
-            <div class="ab-buttons">
-              <button class="ctrl b" onclick={() => pressCheat('b')} aria-label="B button">B</button>
-              <button class="ctrl a" onclick={() => pressCheat('a')} aria-label="A button">A</button>
-            </div>
+      <div class="cheat-console" role="group" aria-label="Alien mode cheat controller">
+        <p class="cheat-title">Enter Yuxbi Cheat Code</p>
+        <div class="controller-row">
+          <div class="dpad">
+            <button class="ctrl up" onclick={() => pressCheat('up')} aria-label="Up">▲</button>
+            <button class="ctrl left" onclick={() => pressCheat('left')} aria-label="Left">◀</button>
+            <button class="ctrl right" onclick={() => pressCheat('right')} aria-label="Right">▶</button>
+            <button class="ctrl down" onclick={() => pressCheat('down')} aria-label="Down">▼</button>
           </div>
-          <div class="cheat-status">
-            <div class="progress-dots" aria-hidden="true">
-              {#each Array(cheatCode.length) as _, i}
-                <span class:active={i < progress}></span>
-              {/each}
-            </div>
-            {#if unlocked}
-              <span class="unlocked">ALIEN MODE ACTIVATED</span>
-            {:else}
-              <span>Code: ↑ ↑ ↓ ↓ ← → ← → B A</span>
-            {/if}
+          <div class="ab-buttons">
+            <button class="ctrl b" onclick={() => pressCheat('b')} aria-label="B button">B</button>
+            <button class="ctrl a" onclick={() => pressCheat('a')} aria-label="A button">A</button>
           </div>
         </div>
+        <div class="cheat-status">
+          <div class="progress-dots" aria-hidden="true">
+            {#each Array(cheatCode.length) as _, i}
+              <span class:active={i < progress}></span>
+            {/each}
+          </div>
+          {#if unlocked}
+            <span class="unlocked">ALIEN MODE ACTIVATED</span>
+          {:else}
+            <span>Sequence in progress</span>
+          {/if}
+        </div>
+      </div>
 
+      <div class="footer-right">
         <a href="https://themeltingbot.com" class="tmb-pill" target="_blank" rel="noopener noreferrer" aria-label="Built by The Melting Bot">
           <svg class="tmb-pill-icon" width="18" height="20" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <line x1="12" y1="3" x2="12" y2="0" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
@@ -304,11 +303,6 @@
   }
 
 
-  .footer-copy {
-    font-size: var(--text-xs);
-    color: var(--color-text-faint);
-  }
-
   .tmb-pill {
     display: inline-flex;
     align-items: center;
@@ -359,7 +353,7 @@
 
     .footer-right {
       flex-direction: column;
-      align-items: center;
+      align-items: flex-end;
     }
   }
 </style>
