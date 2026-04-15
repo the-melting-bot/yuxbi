@@ -15,8 +15,8 @@
   <div class="nav-inner container">
     <a href="/" class="logo" aria-label="Yuxbi home">
       <svg class="logo-icon" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <rect x="2" y="2" width="28" height="28" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
-        <path d="M8 10L16 20L24 10" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="2.5" y="2.5" width="27" height="27" rx="8" stroke="currentColor" stroke-width="2" opacity="0.45" stroke-dasharray="3 4"/>
+        <path d="M8 10L16 20L24 10" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         <circle cx="16" cy="24" r="1.5" fill="var(--color-accent)"/>
       </svg>
       <span class="logo-text">yuxbi</span>
@@ -41,11 +41,11 @@
   }
 
   .nav.scrolled {
-    background: rgba(10, 10, 15, 0.8);
-    backdrop-filter: blur(20px);
+    background: rgba(255, 246, 223, 0.9);
+    backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(30, 30, 54, 0.5);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-bottom: 2px solid rgba(31, 47, 86, 0.18);
+    box-shadow: 0 8px 0 rgba(31, 47, 86, 0.08);
   }
 
   .nav-inner {
@@ -68,7 +68,7 @@
   }
 
   .logo:hover .logo-icon {
-    filter: drop-shadow(0 0 8px rgba(80, 200, 220, 0.3));
+    filter: drop-shadow(0 0 8px rgba(53, 104, 235, 0.35));
   }
 
   .logo-icon {
@@ -97,18 +97,19 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     transition: color 0.3s ease;
-    padding-bottom: 2px;
+    padding: 6px 10px;
+    border-radius: 999px;
   }
 
   .nav-link::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 1px;
-    background: var(--color-accent);
-    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    inset: 0;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background: rgba(53, 104, 235, 0.08);
+    opacity: 0;
+    transition: opacity 0.25s ease, border-color 0.25s ease;
   }
 
   .nav-link:hover {
@@ -116,7 +117,8 @@
   }
 
   .nav-link:hover::after {
-    width: 100%;
+    opacity: 1;
+    border-color: rgba(53, 104, 235, 0.2);
   }
 
   @media (max-width: 640px) {

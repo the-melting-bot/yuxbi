@@ -82,7 +82,7 @@
 
           ctx!.beginPath();
           ctx!.arc(x, y, dotSize, 0, Math.PI * 2);
-          ctx!.fillStyle = `rgba(80, 200, 220, ${dotOpacity})`;
+          ctx!.fillStyle = `rgba(53, 104, 235, ${dotOpacity})`;
           ctx!.fill();
         }
       }
@@ -95,9 +95,9 @@
       const cy = cursor.smoothY || height / 2;
 
       const glow = ctx!.createRadialGradient(cx, cy, 0, cx, cy, 500);
-      glow.addColorStop(0, 'rgba(40, 80, 100, 0.08)');
-      glow.addColorStop(0.5, 'rgba(20, 50, 70, 0.04)');
-      glow.addColorStop(1, 'rgba(10, 10, 15, 0)');
+      glow.addColorStop(0, 'rgba(255, 181, 65, 0.18)');
+      glow.addColorStop(0.45, 'rgba(53, 104, 235, 0.1)');
+      glow.addColorStop(1, 'rgba(255, 246, 223, 0)');
       ctx!.fillStyle = glow;
       ctx!.fillRect(0, 0, width, height);
     }

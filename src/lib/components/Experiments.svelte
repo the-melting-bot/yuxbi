@@ -26,10 +26,14 @@
       <p class="section-sub">Hover to examine. Click anywhere in the hero to leave your mark.</p>
     </div>
 
-    <div class="experiments-grid" class:visible role="list">
+    <div class="shelf-wrap" class:visible>
+      <div class="shelf-rail shelf-rail-top" aria-hidden="true"></div>
+      <div class="experiments-grid" role="list">
       {#each experiments as experiment, i}
         <ExperimentCard {experiment} index={i} />
       {/each}
+      </div>
+      <div class="shelf-rail shelf-rail-bottom" aria-hidden="true"></div>
     </div>
   </div>
 </section>
@@ -84,18 +88,46 @@
     color: var(--color-text-faint);
   }
 
+  .shelf-wrap {
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s var(--ease-out) 0.15s, transform 0.7s var(--ease-out) 0.15s;
+    padding: var(--space-10) var(--space-6);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 244, 219, 0.8));
+    border: 2px solid rgba(31, 47, 86, 0.16);
+    border-radius: 26px;
+    box-shadow: 0 8px 0 rgba(31, 47, 86, 0.1);
+  }
+
+  .shelf-wrap.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .shelf-rail {
+    position: absolute;
+    left: var(--space-6);
+    right: var(--space-6);
+    height: 16px;
+    border-radius: 999px;
+    border: 2px solid rgba(31, 47, 86, 0.16);
+    background: linear-gradient(180deg, #ffd88f, #ffc86a);
+    box-shadow: 0 4px 0 rgba(31, 47, 86, 0.12);
+  }
+
+  .shelf-rail-top {
+    top: -12px;
+  }
+
+  .shelf-rail-bottom {
+    bottom: -12px;
+  }
+
   .experiments-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-6);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.7s var(--ease-out) 0.15s, transform 0.7s var(--ease-out) 0.15s;
-  }
-
-  .experiments-grid.visible {
-    opacity: 1;
-    transform: translateY(0);
   }
 
   @media (max-width: 1024px) {
@@ -105,6 +137,15 @@
   }
 
   @media (max-width: 640px) {
+    .shelf-wrap {
+      padding-inline: var(--space-4);
+    }
+
+    .shelf-rail {
+      left: var(--space-4);
+      right: var(--space-4);
+    }
+
     .experiments-grid {
       grid-template-columns: 1fr;
     }

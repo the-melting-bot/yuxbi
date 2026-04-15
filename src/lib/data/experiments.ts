@@ -5,6 +5,7 @@ export interface Experiment {
   description: string;
   status: 'active' | 'pending' | 'classified';
   category: string;
+  icon: 'lens' | 'radar' | 'ghost' | 'table' | 'orbit' | 'tone';
 }
 
 export const experiments: Experiment[] = [
@@ -14,7 +15,8 @@ export const experiments: Experiment[] = [
     codename: 'SIGNAL-07',
     description: 'Feed it a domain name. It tells you what the site should feel like before it exists.',
     status: 'active',
-    category: 'interpretation'
+    category: 'interpretation',
+    icon: 'lens'
   },
   {
     id: 'exp-002',
@@ -22,7 +24,8 @@ export const experiments: Experiment[] = [
     codename: 'ECHO-14',
     description: 'Paste any URL. Receive a full atmospheric reading of its design language.',
     status: 'active',
-    category: 'analysis'
+    category: 'analysis',
+    icon: 'radar'
   },
   {
     id: 'exp-003',
@@ -30,7 +33,8 @@ export const experiments: Experiment[] = [
     codename: 'STATIC-03',
     description: 'A prompt scrubber that strips filler, sharpens intent, and returns the version you meant to write.',
     status: 'pending',
-    category: 'language'
+    category: 'language',
+    icon: 'ghost'
   },
   {
     id: 'exp-004',
@@ -38,7 +42,8 @@ export const experiments: Experiment[] = [
     codename: 'FLUX-22',
     description: 'Drag data in one shape. It comes out another. No instructions needed.',
     status: 'active',
-    category: 'transformation'
+    category: 'transformation',
+    icon: 'table'
   },
   {
     id: 'exp-005',
@@ -46,7 +51,8 @@ export const experiments: Experiment[] = [
     codename: 'NOVA-11',
     description: 'Generates launch concepts from a single strange input. Name, tagline, landing structure — instant.',
     status: 'classified',
-    category: 'generation'
+    category: 'generation',
+    icon: 'orbit'
   },
   {
     id: 'exp-006',
@@ -54,6 +60,7 @@ export const experiments: Experiment[] = [
     codename: 'PULSE-09',
     description: 'Measures the emotional frequency of your brand copy. Returns a tone map, not a score.',
     status: 'pending',
-    category: 'measurement'
+    category: 'measurement',
+    icon: 'tone'
   }
 ];

@@ -107,8 +107,9 @@
 <style>
   .transmissions {
     position: relative;
-    background: var(--color-surface);
+    background: linear-gradient(180deg, #fff0cc 0%, #ffe7ba 100%);
     overflow: hidden;
+    border-block: 2px solid rgba(31, 47, 86, 0.12);
   }
 
   /* Scanning line */
@@ -119,14 +120,14 @@
     height: 1px;
     background: linear-gradient(90deg,
       transparent 0%,
-      rgba(80, 200, 220, 0.15) 20%,
-      rgba(80, 200, 220, 0.3) 50%,
-      rgba(80, 200, 220, 0.15) 80%,
+      rgba(53, 104, 235, 0.15) 20%,
+      rgba(53, 104, 235, 0.35) 50%,
+      rgba(53, 104, 235, 0.15) 80%,
       transparent 100%
     );
     pointer-events: none;
     z-index: 1;
-    box-shadow: 0 0 20px rgba(80, 200, 220, 0.08);
+    box-shadow: 0 0 16px rgba(53, 104, 235, 0.16);
   }
 
   .section-header {
@@ -165,8 +166,8 @@
     margin-left: var(--space-4);
     padding: 2px 8px;
     border-radius: var(--radius-full);
-    background: rgba(80, 200, 220, 0.08);
-    border: 1px solid rgba(80, 200, 220, 0.15);
+    background: rgba(53, 104, 235, 0.1);
+    border: 2px solid rgba(53, 104, 235, 0.2);
     font-size: 0.7rem;
     letter-spacing: 0.15em;
   }
@@ -237,14 +238,14 @@
     height: 8px;
     border-radius: 50%;
     background: var(--color-border);
-    border: 2px solid var(--color-surface);
+    border: 2px solid #ffe9c2;
     flex-shrink: 0;
     transition: background 0.4s ease, box-shadow 0.4s ease;
   }
 
   .tx-dot.active {
     background: var(--color-accent);
-    box-shadow: 0 0 10px rgba(80, 200, 220, 0.4);
+    box-shadow: 0 0 10px rgba(53, 104, 235, 0.3);
   }
 
   .tx-ping {
@@ -318,9 +319,9 @@
     text-transform: uppercase;
     margin-bottom: var(--space-3);
     padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--color-border);
+    border: 2px solid rgba(31, 47, 86, 0.16);
     border-radius: var(--radius-sm);
-    background: rgba(15, 15, 24, 0.4);
+    background: rgba(255, 255, 255, 0.65);
   }
 
   .tx-icon {

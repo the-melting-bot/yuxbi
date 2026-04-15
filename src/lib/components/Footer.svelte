@@ -8,8 +8,8 @@
       <div class="footer-brand">
         <div class="footer-logo">
           <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <rect x="2" y="2" width="28" height="28" rx="6" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
-            <path d="M8 10L16 20L24 10" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="2.5" y="2.5" width="27" height="27" rx="8" stroke="currentColor" stroke-width="2" opacity="0.45" stroke-dasharray="3 4"/>
+            <path d="M8 10L16 20L24 10" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             <circle cx="16" cy="24" r="1.5" fill="var(--color-accent)"/>
           </svg>
           <span class="footer-name">yuxbi</span>
@@ -45,8 +45,8 @@
 <style>
   .footer {
     padding-block: var(--space-16) var(--space-8);
-    background: var(--color-surface);
-    border-top: 1px solid var(--color-border);
+    background: linear-gradient(180deg, #ffffff 0%, #fff5de 100%);
+    border-top: 2px solid rgba(31, 47, 86, 0.14);
   }
 
   .footer-inner {
@@ -54,7 +54,7 @@
     justify-content: space-between;
     gap: var(--space-12);
     padding-bottom: var(--space-12);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 2px dashed rgba(31, 47, 86, 0.18);
     margin-bottom: var(--space-8);
   }
 
@@ -120,6 +120,7 @@
   .footer-link--muted {
     color: var(--color-text-faint);
     font-style: italic;
+    opacity: 0.85;
   }
 
   .footer-bottom {

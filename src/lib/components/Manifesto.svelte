@@ -126,13 +126,9 @@
     transform: translateY(0) translateX(0);
   }
 
-  .manifesto-line.current {
-    /* Brief glow on the most recently revealed line */
-  }
-
   .manifesto-line.current .line-text {
     color: var(--color-text-bright);
-    text-shadow: 0 0 30px rgba(80, 200, 220, 0.15);
+    text-shadow: 0 0 24px rgba(53, 104, 235, 0.2);
   }
 
   .line-number {
@@ -193,7 +189,7 @@
     transform: translateX(-50%);
     width: 600px;
     height: 400px;
-    background: radial-gradient(ellipse, rgba(80, 200, 220, 0.04) 0%, transparent 70%);
+    background: radial-gradient(ellipse, rgba(53, 104, 235, 0.12) 0%, transparent 70%);
     pointer-events: none;
   }
 

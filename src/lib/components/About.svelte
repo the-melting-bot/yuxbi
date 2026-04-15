@@ -132,9 +132,9 @@
 
   .about-card {
     padding: var(--space-8);
-    border: 1px solid var(--color-border);
+    border: 2px solid rgba(31, 47, 86, 0.18);
     border-radius: var(--radius-xl);
-    background: var(--color-surface);
+    background: linear-gradient(180deg, #ffffff 0%, #fff5dd 100%);
     will-change: transform;
     transition:
       border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
@@ -148,10 +148,10 @@
   }
 
   .about-card:hover {
-    border-color: rgba(80, 200, 220, 0.25);
+    border-color: rgba(53, 104, 235, 0.35);
     box-shadow:
-      0 12px 40px rgba(0, 0, 0, 0.3),
-      0 0 30px rgba(80, 200, 220, 0.05);
+      0 8px 0 rgba(31, 47, 86, 0.14),
+      0 0 24px rgba(53, 104, 235, 0.08);
   }
 
   .card-icon-wrapper {
@@ -161,8 +161,8 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-md);
-    background: rgba(80, 200, 220, 0.06);
-    border: 1px solid rgba(80, 200, 220, 0.1);
+    background: rgba(53, 104, 235, 0.08);
+    border: 2px solid rgba(53, 104, 235, 0.15);
     margin-bottom: var(--space-5);
   }
 

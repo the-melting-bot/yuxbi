@@ -24,7 +24,7 @@
   <meta name="twitter:description" content="A digital lab for strange but useful experiments. One-purpose tools built from ideas too weird for anywhere else." />
 
   <!-- Theme -->
-  <meta name="theme-color" content="#0a0a0f" />
+  <meta name="theme-color" content="#fff6df" />
 </svelte:head>
 
 <Nav />

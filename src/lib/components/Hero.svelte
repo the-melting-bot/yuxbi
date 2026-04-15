@@ -41,28 +41,28 @@
   <div class="hero-floaters" aria-hidden="true">
     <div class="floater floater-1" style="transform: translate({offsetX * 2.5}px, {offsetY * 2.5}px)">
       <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-        <circle cx="20" cy="20" r="18" stroke="rgba(80,200,220,0.15)" stroke-width="1"/>
-        <circle cx="20" cy="20" r="8" stroke="rgba(80,200,220,0.1)" stroke-width="0.5"/>
+        <circle cx="20" cy="20" r="18" stroke="rgba(53,104,235,0.25)" stroke-width="1"/>
+        <circle cx="20" cy="20" r="8" stroke="rgba(53,104,235,0.15)" stroke-width="0.5"/>
       </svg>
     </div>
     <div class="floater floater-2" style="transform: translate({-offsetX * 1.8}px, {-offsetY * 1.5}px)">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L14 10L22 12L14 14L12 22L10 14L2 12L10 10Z" fill="rgba(144,96,192,0.12)"/>
+        <path d="M12 2L14 10L22 12L14 14L12 22L10 14L2 12L10 10Z" fill="rgba(247,109,184,0.28)"/>
       </svg>
     </div>
     <div class="floater floater-3" style="transform: translate({offsetX * 3}px, {-offsetY * 2}px)">
       <svg width="30" height="6" viewBox="0 0 30 6" fill="none">
-        <rect width="30" height="6" rx="3" fill="rgba(80,200,220,0.1)"/>
+        <rect width="30" height="6" rx="3" fill="rgba(255,181,65,0.35)"/>
       </svg>
     </div>
     <div class="floater floater-4" style="transform: translate({-offsetX * 2}px, {offsetY * 3}px)">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <rect x="2" y="2" width="16" height="16" rx="3" stroke="rgba(100,180,255,0.12)" stroke-width="1" transform="rotate(15 10 10)"/>
+        <rect x="2" y="2" width="16" height="16" rx="3" stroke="rgba(53,104,235,0.25)" stroke-width="1" transform="rotate(15 10 10)"/>
       </svg>
     </div>
     <div class="floater floater-5" style="transform: translate({offsetX * 1.5}px, {offsetY * 2.2}px)">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M8 0L10 6L16 8L10 10L8 16L6 10L0 8L6 6Z" fill="rgba(60,220,180,0.1)"/>
+        <path d="M8 0L10 6L16 8L10 10L8 16L6 10L0 8L6 6Z" fill="rgba(27,182,115,0.28)"/>
       </svg>
     </div>
   </div>
@@ -113,7 +113,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: var(--color-bg);
+    background: transparent;
   }
 
   /* === Floating decorative elements === */
@@ -196,10 +196,11 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-4);
-    border: 1px solid var(--color-border);
+    border: 2px solid rgba(31, 47, 86, 0.22);
     border-radius: var(--radius-full);
-    background: rgba(15, 15, 24, 0.6);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 5px 0 rgba(31, 47, 86, 0.12);
   }
 
   .badge-dot {
@@ -218,7 +219,7 @@
   .badge-text {
     font-family: var(--font-display);
     font-size: var(--text-xs);
-    color: var(--color-text-muted);
+    color: var(--color-text);
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
@@ -245,7 +246,7 @@
 
   .hero-sub {
     font-size: var(--text-lg);
-    color: var(--color-text-muted);
+    color: var(--color-text);
     max-width: 540px;
     line-height: 1.6;
   }
@@ -261,7 +262,7 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
-    border-radius: var(--radius-full);
+    border-radius: 16px;
     font-family: var(--font-display);
     font-size: var(--text-sm);
     font-weight: 500;
@@ -273,37 +274,39 @@
 
   .btn-primary {
     background: var(--color-accent);
-    color: var(--color-bg);
-    box-shadow: 0 0 20px rgba(80, 200, 220, 0.2);
+    color: #fff;
+    border: 2px solid #1f2f56;
+    box-shadow: 0 6px 0 #1f2f56;
   }
 
   .btn-primary:hover {
-    background: #60d8ec;
-    box-shadow: 0 0 30px rgba(80, 200, 220, 0.35);
-    transform: translateY(-3px) scale(1.03);
+    background: #4478ff;
+    transform: translateY(-4px) scale(1.03) rotate(-1deg);
   }
 
   .btn-primary:active {
-    transform: translateY(1px) scale(0.98);
+    transform: translateY(2px) scale(0.99);
     transition-duration: 0.1s;
+    box-shadow: 0 3px 0 #1f2f56;
   }
 
   .btn-ghost {
-    border: 1px solid var(--color-border);
-    color: var(--color-text);
-    background: rgba(15, 15, 24, 0.4);
-    backdrop-filter: blur(10px);
+    border: 2px solid var(--color-border);
+    color: var(--color-text-bright);
+    background: #fff;
+    box-shadow: 0 6px 0 rgba(31, 47, 86, 0.14);
   }
 
   .btn-ghost:hover {
-    border-color: var(--color-accent-dim);
+    border-color: var(--color-accent);
     color: var(--color-accent);
-    transform: translateY(-3px) scale(1.03);
+    transform: translateY(-4px) scale(1.03) rotate(1deg);
   }
 
   .btn-ghost:active {
-    transform: translateY(1px) scale(0.98);
+    transform: translateY(2px) scale(0.99);
     transition-duration: 0.1s;
+    box-shadow: 0 3px 0 rgba(31, 47, 86, 0.14);
   }
 
   .btn-icon {
@@ -313,13 +316,13 @@
 
   .hero-hint {
     margin-top: var(--space-6);
-    opacity: 0.25;
+    opacity: 0.55;
   }
 
   .hint-text {
     font-family: var(--font-display);
     font-size: var(--text-xs);
-    color: var(--color-text-faint);
+    color: var(--color-text-muted);
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
@@ -330,7 +333,7 @@
     left: 0;
     right: 0;
     height: 200px;
-    background: linear-gradient(to bottom, transparent, var(--color-bg));
+    background: linear-gradient(to bottom, transparent, rgba(255, 246, 223, 0.95));
     z-index: 5;
   }
 

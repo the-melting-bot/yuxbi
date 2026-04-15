@@ -24,6 +24,7 @@
   let glowY = $state(50);
   let isHovered = $state(false);
   let floatY = $state(0);
+  let rotate = $state(0);
 
   // Smooth tilt with spring physics
   let targetTiltX = 0;
@@ -38,15 +39,16 @@
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
 
-    targetTiltX = (y - 0.5) * -12;
-    targetTiltY = (x - 0.5) * 12;
+    targetTiltX = (y - 0.5) * -18;
+    targetTiltY = (x - 0.5) * 18;
+    rotate = (x - 0.5) * 3.2;
     glowX = x * 100;
     glowY = y * 100;
   }
 
   function onMouseEnter() {
     isHovered = true;
-    floatY = -6;
+    floatY = -10;
 
     function tick() {
       currentTiltX += (targetTiltX - currentTiltX) * 0.12;
@@ -66,6 +68,7 @@
     targetTiltX = 0;
     targetTiltY = 0;
     floatY = 0;
+    rotate = 0;
 
     // Spring back
     function springBack() {
@@ -91,7 +94,7 @@
   bind:this={cardEl}
   style="
     --index: {index};
-    transform: perspective(800px) rotateX({tiltX}deg) rotateY({tiltY}deg) translateY({floatY}px);
+    transform: perspective(800px) rotateX({tiltX}deg) rotateY({tiltY}deg) rotateZ({rotate}deg) translateY({floatY}px);
     --glow-x: {glowX}%;
     --glow-y: {glowY}%;
   "
@@ -112,6 +115,48 @@
     </span>
   </div>
 
+  <div class="card-doodle" aria-hidden="true">
+    {#if experiment.icon === 'lens'}
+      <svg viewBox="0 0 80 80" fill="none">
+        <circle cx="36" cy="36" r="22" stroke="#2047af" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 5"/>
+        <circle cx="36" cy="36" r="11" stroke="#3568eb" stroke-width="3"/>
+        <path d="M50 51L66 68" stroke="#2047af" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    {:else if experiment.icon === 'radar'}
+      <svg viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="24" stroke="#3568eb" stroke-width="3"/>
+        <circle cx="40" cy="40" r="14" stroke="#3568eb" stroke-width="3" stroke-dasharray="4 7"/>
+        <path d="M40 40L57 26" stroke="#f76db8" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="57" cy="26" r="4" fill="#f76db8"/>
+      </svg>
+    {:else if experiment.icon === 'ghost'}
+      <svg viewBox="0 0 80 80" fill="none">
+        <path d="M24 51V35C24 25 31 18 40 18C49 18 56 25 56 35V51L51 47L46 51L40 47L34 51L29 47L24 51Z" fill="#ffffff" stroke="#1f2f56" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="35" cy="36" r="3" fill="#1f2f56"/>
+        <circle cx="45" cy="36" r="3" fill="#1f2f56"/>
+      </svg>
+    {:else if experiment.icon === 'table'}
+      <svg viewBox="0 0 80 80" fill="none">
+        <rect x="16" y="22" width="48" height="36" rx="8" fill="#fff" stroke="#1f2f56" stroke-width="3"/>
+        <path d="M16 34H64M32 22V58M48 22V58" stroke="#3568eb" stroke-width="3"/>
+        <circle cx="24" cy="28" r="2.5" fill="#f39a19"/>
+      </svg>
+    {:else if experiment.icon === 'orbit'}
+      <svg viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="8" fill="#8d57eb"/>
+        <ellipse cx="40" cy="40" rx="26" ry="13" stroke="#1f2f56" stroke-width="3"/>
+        <ellipse cx="40" cy="40" rx="13" ry="26" stroke="#3568eb" stroke-width="3"/>
+        <circle cx="27" cy="25" r="3.5" fill="#f76db8"/>
+      </svg>
+    {:else}
+      <svg viewBox="0 0 80 80" fill="none">
+        <path d="M12 47C20 38 31 36 40 40C49 44 61 43 68 34" stroke="#3568eb" stroke-width="4" stroke-linecap="round"/>
+        <path d="M12 57C21 49 31 47 40 50C49 53 60 51 68 43" stroke="#f76db8" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="20" cy="29" r="4" fill="#1bb673"/>
+      </svg>
+    {/if}
+  </div>
+
   <h3 class="card-name">{experiment.name}</h3>
 
   <p class="card-description">{experiment.description}</p>
@@ -128,31 +173,34 @@
   .experiment-card {
     position: relative;
     padding: var(--space-8);
-    border: 1px solid var(--color-border);
+    border: 2px solid rgba(31, 47, 86, 0.2);
     border-radius: var(--radius-xl);
-    background: var(--color-surface);
+    background: linear-gradient(180deg, #ffffff 0%, #fff8e9 100%);
     overflow: hidden;
     cursor: pointer;
     will-change: transform;
     transform-style: preserve-3d;
     transition:
       box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      background 0.4s ease;
     /* Staggered float animation */
     animation: cardFloat calc(6s + var(--index) * 0.5s) ease-in-out infinite;
     animation-delay: calc(var(--index) * -0.8s);
+    transform-origin: center 70%;
   }
 
   @keyframes cardFloat {
     0%, 100% { translate: 0 0; }
-    50% { translate: 0 -4px; }
+    50% { translate: 0 -6px; }
   }
 
   .experiment-card.hovered {
-    border-color: rgba(80, 200, 220, 0.3);
+    border-color: rgba(53, 104, 235, 0.35);
     box-shadow:
-      0 20px 60px rgba(0, 0, 0, 0.4),
-      0 0 40px rgba(80, 200, 220, 0.06);
+      0 14px 0 rgba(31, 47, 86, 0.14),
+      0 0 26px rgba(53, 104, 235, 0.1);
+    background: linear-gradient(180deg, #ffffff 0%, #eff4ff 100%);
     z-index: 2;
   }
 
@@ -163,7 +211,7 @@
     opacity: 0;
     background: radial-gradient(
       300px circle at var(--glow-x) var(--glow-y),
-      rgba(80, 200, 220, 0.06),
+      rgba(53, 104, 235, 0.13),
       transparent 60%
     );
     transition: opacity 0.3s ease;
@@ -181,7 +229,7 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+    background: linear-gradient(90deg, transparent, #f76db8, var(--color-accent), transparent);
     opacity: 0;
     transition: opacity 0.4s ease;
   }
@@ -238,20 +286,20 @@
 
   .status-active {
     color: var(--color-signal-active);
-    border-color: rgba(80, 200, 220, 0.3);
-    background: rgba(80, 200, 220, 0.06);
+    border-color: rgba(27, 182, 115, 0.28);
+    background: rgba(27, 182, 115, 0.1);
   }
 
   .status-pending {
     color: var(--color-signal-pending);
-    border-color: rgba(136, 136, 160, 0.3);
-    background: rgba(136, 136, 160, 0.06);
+    border-color: rgba(243, 154, 25, 0.28);
+    background: rgba(243, 154, 25, 0.1);
   }
 
   .status-classified {
     color: var(--color-signal-classified);
-    border-color: rgba(144, 96, 192, 0.3);
-    background: rgba(144, 96, 192, 0.06);
+    border-color: rgba(141, 87, 235, 0.3);
+    background: rgba(141, 87, 235, 0.1);
   }
 
   .card-name {
@@ -273,6 +321,22 @@
     color: var(--color-text-muted);
     line-height: 1.7;
     margin-bottom: var(--space-8);
+  }
+
+  .card-doodle {
+    width: 68px;
+    height: 68px;
+    margin-bottom: var(--space-4);
+    padding: 8px;
+    border-radius: 14px;
+    border: 2px solid rgba(31, 47, 86, 0.16);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 4px 0 rgba(31, 47, 86, 0.1);
+  }
+
+  .card-doodle svg {
+    width: 100%;
+    height: 100%;
   }
 
   .card-footer {
