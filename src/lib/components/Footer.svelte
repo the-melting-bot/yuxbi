@@ -54,7 +54,7 @@
       <span class="footer-copy">© {year} Yuxbi</span>
       <div class="footer-right">
         <div class="cheat-console" role="group" aria-label="Alien mode cheat controller">
-          <p class="cheat-title">Enter Cheat Code</p>
+          <p class="cheat-title">Enter Yuxbi Cheat Code</p>
           <div class="controller-row">
             <div class="dpad">
               <button class="ctrl up" onclick={() => pressCheat('up')} aria-label="Up">▲</button>
@@ -191,7 +191,8 @@
   }
   .footer-right {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
+    justify-content: flex-end;
     gap: var(--space-4);
   }
 
@@ -201,7 +202,7 @@
     border: 2px solid rgba(31, 47, 86, 0.2);
     background: rgba(255, 255, 255, 0.88);
     box-shadow: 0 5px 0 rgba(31, 47, 86, 0.12);
-    min-width: 260px;
+    min-width: 280px;
   }
 
   .cheat-title {
