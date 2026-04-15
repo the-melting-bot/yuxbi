@@ -90,7 +90,7 @@
 
     <div class="status-area">
       <p class="status-message">{messages[phase]}</p>
-      <p class="status-brand">YUXBI CARTOON LAB</p>
+      <p class="status-brand">YUXBI LAB</p>
       <div class="progress-bar">
         <div class="progress-fill" style="width: {progress * 100}%"></div>
       </div>
@@ -115,6 +115,15 @@
       radial-gradient(circle at 82% 20%, rgba(53, 104, 235, 0.18), transparent 24%),
       radial-gradient(circle at 50% 85%, rgba(255, 199, 97, 0.3), transparent 36%),
       var(--color-bg);
+    animation: loadingFailsafeHide 0.8s ease 6s forwards;
+  }
+
+  @keyframes loadingFailsafeHide {
+    to {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
   }
 
   .cartoon-space {
