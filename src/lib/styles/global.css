@@ -242,7 +242,8 @@ a, button, [role='button'] {
 }
 
 /* --- Konami: Alien Night Mode --- */
-body.alien-night-mode {
+body.alien-night-mode,
+.alien-night-mode-root {
   --color-bg: #070b1e;
   --color-surface: #101835;
   --color-surface-2: #152144;
@@ -267,7 +268,12 @@ body.alien-night-mode h1,
 body.alien-night-mode h2,
 body.alien-night-mode h3,
 body.alien-night-mode .hero-headline,
-body.alien-night-mode .section-title {
+body.alien-night-mode .section-title,
+.alien-night-mode-root h1,
+.alien-night-mode-root h2,
+.alien-night-mode-root h3,
+.alien-night-mode-root .hero-headline,
+.alien-night-mode-root .section-title {
   animation: alienWobble 2.2s ease-in-out infinite;
   text-shadow: 0 0 22px rgba(126, 212, 255, 0.32);
 }
@@ -275,7 +281,11 @@ body.alien-night-mode .section-title {
 body.alien-night-mode p,
 body.alien-night-mode .nav-link,
 body.alien-night-mode .badge-text,
-body.alien-night-mode .line-text {
+body.alien-night-mode .line-text,
+.alien-night-mode-root p,
+.alien-night-mode-root .nav-link,
+.alien-night-mode-root .badge-text,
+.alien-night-mode-root .line-text {
   animation: alienWobbleSoft 3.2s ease-in-out infinite;
 }
 
@@ -287,7 +297,11 @@ body.alien-night-mode .noise-overlay {
 body.alien-night-mode .hero,
 body.alien-night-mode .manifesto,
 body.alien-night-mode .experiments,
-body.alien-night-mode .about {
+body.alien-night-mode .about,
+.alien-night-mode-root .hero,
+.alien-night-mode-root .manifesto,
+.alien-night-mode-root .experiments,
+.alien-night-mode-root .about {
   filter: saturate(1.12) hue-rotate(12deg);
 }
 
@@ -302,13 +316,25 @@ body.alien-night-mode .experiment-card,
 body.alien-night-mode .tx-label,
 body.alien-night-mode .hero-badge,
 body.alien-night-mode .btn-ghost,
-body.alien-night-mode .tmb-pill {
+body.alien-night-mode .tmb-pill,
+.alien-night-mode-root .transmissions,
+.alien-night-mode-root .footer,
+.alien-night-mode-root .shelf-wrap,
+.alien-night-mode-root .encounter-stage,
+.alien-night-mode-root .message-orb,
+.alien-night-mode-root .about-card,
+.alien-night-mode-root .experiment-card,
+.alien-night-mode-root .tx-label,
+.alien-night-mode-root .hero-badge,
+.alien-night-mode-root .btn-ghost,
+.alien-night-mode-root .tmb-pill {
   background: linear-gradient(180deg, rgba(17, 29, 62, 0.92), rgba(11, 20, 44, 0.92)) !important;
   border-color: rgba(142, 217, 255, 0.34) !important;
   box-shadow: 0 8px 0 rgba(4, 10, 24, 0.4), 0 0 18px rgba(109, 196, 255, 0.15) !important;
 }
 
-body.alien-night-mode .shelf-rail {
+body.alien-night-mode .shelf-rail,
+.alien-night-mode-root .shelf-rail {
   background: linear-gradient(180deg, #3b4f9e, #293a7c) !important;
   border-color: rgba(142, 217, 255, 0.32) !important;
 }
@@ -317,19 +343,29 @@ body.alien-night-mode .ufo-base,
 body.alien-night-mode .ufo-dome,
 body.alien-night-mode .ufo-loader .ufo-base,
 body.alien-night-mode .ufo-loader .ufo-dome,
-body.alien-night-mode .card-doodle {
+body.alien-night-mode .card-doodle,
+.alien-night-mode-root .ufo-base,
+.alien-night-mode-root .ufo-dome,
+.alien-night-mode-root .ufo-loader .ufo-base,
+.alien-night-mode-root .ufo-loader .ufo-dome,
+.alien-night-mode-root .card-doodle {
   background: linear-gradient(180deg, rgba(30, 47, 97, 0.95), rgba(18, 30, 66, 0.95)) !important;
   border-color: rgba(142, 217, 255, 0.38) !important;
 }
 
-body.alien-night-mode .tractor-beam {
+body.alien-night-mode .tractor-beam,
+.alien-night-mode-root .tractor-beam {
   opacity: 0.75;
 }
 
 body.alien-night-mode .night-label,
 body.alien-night-mode .encounter-hints span,
 body.alien-night-mode .live-indicator,
-body.alien-night-mode .card-status {
+body.alien-night-mode .card-status,
+.alien-night-mode-root .night-label,
+.alien-night-mode-root .encounter-hints span,
+.alien-night-mode-root .live-indicator,
+.alien-night-mode-root .card-status {
   border-color: rgba(142, 217, 255, 0.4) !important;
 }
 
@@ -339,7 +375,14 @@ body.alien-night-mode .card-description,
 body.alien-night-mode .footer-link,
 body.alien-night-mode .footer-tagline,
 body.alien-night-mode .tx-timestamp,
-body.alien-night-mode .hint-text {
+body.alien-night-mode .hint-text,
+.alien-night-mode-root .section-sub,
+.alien-night-mode-root .tx-body,
+.alien-night-mode-root .card-description,
+.alien-night-mode-root .footer-link,
+.alien-night-mode-root .footer-tagline,
+.alien-night-mode-root .tx-timestamp,
+.alien-night-mode-root .hint-text {
   color: var(--color-text-muted) !important;
 }
 

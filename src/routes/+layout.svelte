@@ -10,7 +10,9 @@
   let { children }: Props = $props();
   let alienNightMode = $state(false);
   let easterEggBurst = $state(false);
+  let showAlienToggle = $state(false);
   let easterEggTimer: ReturnType<typeof setTimeout> | null = null;
+  let toggleRevealTimer: ReturnType<typeof setTimeout> | null = null;
   const alienShips = [0, 1, 2];
   const laserRows = [0, 1, 2, 3];
 
@@ -33,6 +35,14 @@
   }
 
   $effect(() => {
+    alienNightMode;
+    document.body.classList.toggle('alien-night-mode', alienNightMode);
+    return () => {
+      document.body.classList.remove('alien-night-mode');
+    };
+  });
+
+  $effect(() => {
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
@@ -41,23 +51,41 @@
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     });
+
+    // Match loading sequence duration so toggle appears after intro.
+    toggleRevealTimer = setTimeout(() => {
+      showAlienToggle = true;
+    }, 4600);
+
     return () => {
       if (easterEggTimer) clearTimeout(easterEggTimer);
+      if (toggleRevealTimer) clearTimeout(toggleRevealTimer);
     };
   });
 </script>
 
 <LoadingScreen />
-<button
-  class="alien-mode-toggle"
-  onclick={toggleAlienNightMode}
-  aria-pressed={alienNightMode}
-  aria-label="Toggle alien night mode"
->
-  {alienNightMode ? 'Disable Alien Night Mode' : 'Alien Night Mode'}
-</button>
+<!--
+ _______   __              __  __     __              ____            __
+/_  __/ | / /___   ____ _ / /_/ /_   / /_   ___      / __ )____  ____/ /_
+ / / /  |/ // _ \ / __ `// __/ __ \ / __ \ / _ \    / __  / __ \/ __  / /
+/ / / /|  //  __// /_/ // /_/ / / // /_/ //  __/   / /_/ / /_/ / /_/ / /
+/_/ /_/ |_/ \___/ \__,_/ \__/_/ /_//_.___/ \___/   /_____/\____/\__,_/_/
+
+KONAMI CHEAT CODE: ↑ ↑ ↓ ↓ ← → ← → B A
+-->
+
+{#if showAlienToggle}
+  <button
+    class="alien-mode-toggle"
+    onclick={toggleAlienNightMode}
+    aria-pressed={alienNightMode}
+    aria-label="Toggle alien night mode"
+  >
+    {alienNightMode ? 'Disable Alien Night Mode' : 'Alien Night Mode'}
+  </button>
+{/if}
 <div class="noise-overlay" aria-hidden="true"></div>
-<svelte:body class:alien-night-mode={alienNightMode} />
 
 {#if alienNightMode}
   <div class="alien-night-overlay" aria-hidden="true">
@@ -80,7 +108,9 @@
   </div>
 {/if}
 
-{@render children()}
+<div class="site-shell" class:alien-night-mode-root={alienNightMode}>
+  {@render children()}
+</div>
 
 <style>
   .alien-mode-toggle {
