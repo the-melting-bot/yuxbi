@@ -291,6 +291,58 @@ body.alien-night-mode .about {
   filter: saturate(1.12) hue-rotate(12deg);
 }
 
+/* Force bright custom surfaces into dark variants */
+body.alien-night-mode .transmissions,
+body.alien-night-mode .footer,
+body.alien-night-mode .shelf-wrap,
+body.alien-night-mode .encounter-stage,
+body.alien-night-mode .message-orb,
+body.alien-night-mode .about-card,
+body.alien-night-mode .experiment-card,
+body.alien-night-mode .tx-label,
+body.alien-night-mode .hero-badge,
+body.alien-night-mode .btn-ghost,
+body.alien-night-mode .tmb-pill {
+  background: linear-gradient(180deg, rgba(17, 29, 62, 0.92), rgba(11, 20, 44, 0.92)) !important;
+  border-color: rgba(142, 217, 255, 0.34) !important;
+  box-shadow: 0 8px 0 rgba(4, 10, 24, 0.4), 0 0 18px rgba(109, 196, 255, 0.15) !important;
+}
+
+body.alien-night-mode .shelf-rail {
+  background: linear-gradient(180deg, #3b4f9e, #293a7c) !important;
+  border-color: rgba(142, 217, 255, 0.32) !important;
+}
+
+body.alien-night-mode .ufo-base,
+body.alien-night-mode .ufo-dome,
+body.alien-night-mode .ufo-loader .ufo-base,
+body.alien-night-mode .ufo-loader .ufo-dome,
+body.alien-night-mode .card-doodle {
+  background: linear-gradient(180deg, rgba(30, 47, 97, 0.95), rgba(18, 30, 66, 0.95)) !important;
+  border-color: rgba(142, 217, 255, 0.38) !important;
+}
+
+body.alien-night-mode .tractor-beam {
+  opacity: 0.75;
+}
+
+body.alien-night-mode .night-label,
+body.alien-night-mode .encounter-hints span,
+body.alien-night-mode .live-indicator,
+body.alien-night-mode .card-status {
+  border-color: rgba(142, 217, 255, 0.4) !important;
+}
+
+body.alien-night-mode .section-sub,
+body.alien-night-mode .tx-body,
+body.alien-night-mode .card-description,
+body.alien-night-mode .footer-link,
+body.alien-night-mode .footer-tagline,
+body.alien-night-mode .tx-timestamp,
+body.alien-night-mode .hint-text {
+  color: var(--color-text-muted) !important;
+}
+
 @keyframes alienWobble {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   25% { transform: translateY(-1px) rotate(-0.45deg); }
