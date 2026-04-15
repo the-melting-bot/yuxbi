@@ -35,6 +35,15 @@
   }
 
   $effect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // Ensure refresh always re-enters from top.
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    });
+
     function onKeydown(e: KeyboardEvent) {
       const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
       if (key === konamiCode[konamiProgress]) {
