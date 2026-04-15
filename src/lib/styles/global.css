@@ -240,3 +240,65 @@ a, button, [role='button'] {
   background-repeat: repeat;
   mix-blend-mode: multiply;
 }
+
+/* --- Konami: Alien Night Mode --- */
+body.alien-night-mode {
+  --color-bg: #070b1e;
+  --color-surface: #101835;
+  --color-surface-2: #152144;
+  --color-surface-3: #1a2850;
+  --color-border: #8ed9ff;
+  --color-text: #d8ecff;
+  --color-text-muted: #a3c8ef;
+  --color-text-faint: #7ba0cc;
+  --color-text-bright: #f1fbff;
+  --color-accent: #7fd3ff;
+  --color-accent-dim: #4da7d8;
+  --color-secondary: #c18dff;
+  --color-secondary-dim: #9d6fd4;
+  background:
+    radial-gradient(circle at 15% 18%, rgba(108, 86, 255, 0.28), transparent 34%),
+    radial-gradient(circle at 82% 22%, rgba(85, 201, 255, 0.26), transparent 30%),
+    radial-gradient(circle at 45% 80%, rgba(209, 113, 255, 0.24), transparent 32%),
+    #070b1e;
+}
+
+body.alien-night-mode h1,
+body.alien-night-mode h2,
+body.alien-night-mode h3,
+body.alien-night-mode .hero-headline,
+body.alien-night-mode .section-title {
+  animation: alienWobble 2.2s ease-in-out infinite;
+  text-shadow: 0 0 22px rgba(126, 212, 255, 0.32);
+}
+
+body.alien-night-mode p,
+body.alien-night-mode .nav-link,
+body.alien-night-mode .badge-text,
+body.alien-night-mode .line-text {
+  animation: alienWobbleSoft 3.2s ease-in-out infinite;
+}
+
+body.alien-night-mode .noise-overlay {
+  opacity: 0.055;
+  mix-blend-mode: screen;
+}
+
+body.alien-night-mode .hero,
+body.alien-night-mode .manifesto,
+body.alien-night-mode .experiments,
+body.alien-night-mode .about {
+  filter: saturate(1.12) hue-rotate(12deg);
+}
+
+@keyframes alienWobble {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-1px) rotate(-0.45deg); }
+  50% { transform: translateY(1px) rotate(0.45deg); }
+  75% { transform: translateY(-1px) rotate(-0.35deg); }
+}
+
+@keyframes alienWobbleSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.5px); }
+}
