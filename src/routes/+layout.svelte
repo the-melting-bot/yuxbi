@@ -34,12 +34,27 @@
     }
   }
 
+  function activateFromCheatController() {
+    if (!alienNightMode) {
+      alienNightMode = true;
+    }
+    triggerEasterEggBurst();
+  }
+
   $effect(() => {
     alienNightMode;
     document.body.classList.toggle('alien-night-mode', alienNightMode);
     return () => {
       document.body.classList.remove('alien-night-mode');
     };
+  });
+
+  $effect(() => {
+    function onCheatTrigger() {
+      activateFromCheatController();
+    }
+    window.addEventListener('yuxbi:alien-cheat', onCheatTrigger);
+    return () => window.removeEventListener('yuxbi:alien-cheat', onCheatTrigger);
   });
 
   $effect(() => {
