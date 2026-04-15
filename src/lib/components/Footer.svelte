@@ -1,5 +1,4 @@
 <script lang="ts">
-  const year = new Date().getFullYear();
   const cheatCode = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
   let progress = $state(0);
   let unlocked = $state(false);
