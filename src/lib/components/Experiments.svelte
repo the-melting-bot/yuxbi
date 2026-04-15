@@ -4,10 +4,18 @@
 
   let sectionEl: HTMLElement;
   let visible = $state(false);
+  let shelfCycle = $state(0);
 
   $effect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) visible = true; },
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          visible = true;
+          shelfCycle += 1;
+        } else {
+          visible = false;
+        }
+      },
       { threshold: 0.1 }
     );
     if (sectionEl) observer.observe(sectionEl);
@@ -30,7 +38,7 @@
       <div class="shelf-rail shelf-rail-top" aria-hidden="true"></div>
       <div class="experiments-grid" role="list">
       {#each experiments as experiment, i}
-        <ExperimentCard {experiment} index={i} onShelf={visible} />
+        <ExperimentCard {experiment} index={i} onShelf={visible} shelfCycle={shelfCycle} />
       {/each}
       </div>
       <div class="shelf-rail shelf-rail-bottom" aria-hidden="true"></div>

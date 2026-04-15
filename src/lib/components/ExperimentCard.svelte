@@ -5,9 +5,10 @@
     experiment: Experiment;
     index: number;
     onShelf: boolean;
+    shelfCycle: number;
   }
 
-  let { experiment, index, onShelf }: Props = $props();
+  let { experiment, index, onShelf, shelfCycle }: Props = $props();
 
   const statusMap = {
     active: { label: 'Active', class: 'status-active' },
@@ -29,7 +30,10 @@
   let settled = $state(false);
 
   $effect(() => {
-    if (!onShelf || settled) return;
+    shelfCycle;
+    if (!onShelf) return;
+
+    settled = false;
     const timer = setTimeout(() => {
       settled = true;
     }, 600 + index * 80);

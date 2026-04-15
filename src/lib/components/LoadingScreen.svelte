@@ -1,38 +1,31 @@
 <script lang="ts">
-  let phase = $state(0); // 0=assembling, 1=calibrating, 2=launching, 3=done
+  let phase = $state(0); // 0=warming crayons, 1=drawing stars, 2=beaming in, 3=launching weirdness
   let progress = $state(0);
   let opacity = $state(1);
   let done = $state(false);
-  let fragments: { x: number; y: number; r: number; s: number; dx: number; dy: number; delay: number }[] = $state([]);
+  let sparkles: { x: number; y: number; size: number; delay: number }[] = $state([]);
 
   const messages = [
-    'INITIALIZING LAB SYSTEMS',
-    'CALIBRATING SIGNAL ARRAY',
-    'ENGAGING DRIFT PROTOCOL',
-    'LABORATORY ACTIVE'
+    'WARMING UP CRAYONS',
+    'DOODLING THE STARS',
+    'BEAMING IN THE WEIRD',
+    'LIFT OFF: LAB IS LIVE'
   ];
 
   $effect(() => {
-    // Generate fragment positions (converge to center)
-    const frags = [];
-    for (let i = 0; i < 12; i++) {
-      const angle = (i / 12) * Math.PI * 2;
-      const dist = 120 + Math.random() * 80;
-      frags.push({
-        x: Math.cos(angle) * dist,
-        y: Math.sin(angle) * dist,
-        r: Math.random() * 360,
-        s: Math.random() * 0.5 + 0.5,
-        dx: (Math.random() - 0.5) * 200,
-        dy: (Math.random() - 0.5) * 200,
-        delay: i * 0.04
+    const stars = [];
+    for (let i = 0; i < 24; i++) {
+      stars.push({
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 8 + Math.random() * 14,
+        delay: i * 0.07
       });
     }
-    fragments = frags;
+    sparkles = stars;
 
-    // Progress animation
     const startTime = Date.now();
-    const totalDuration = 2200;
+    const totalDuration = 3600;
 
     function tick() {
       const elapsed = Date.now() - startTime;
@@ -46,9 +39,8 @@
       else phase = 3;
 
       if (t >= 1) {
-        // Fade out
         opacity = 0;
-        setTimeout(() => { done = true; }, 600);
+        setTimeout(() => { done = true; }, 700);
         return;
       }
 
@@ -66,53 +58,39 @@
     aria-live="polite"
     role="status"
   >
-    <!-- Magnetic assembly fragments -->
-    <div class="assembly-container">
-      {#each fragments as frag, i}
+    <div class="cartoon-space" aria-hidden="true">
+      {#each sparkles as s, i}
         <div
-          class="fragment"
+          class="sparkle"
           style="
-            --start-x: {frag.dx}px;
-            --start-y: {frag.dy}px;
-            --target-x: {frag.x}px;
-            --target-y: {frag.y}px;
-            --rotation: {frag.r}deg;
-            --scale: {frag.s};
-            --delay: {frag.delay}s;
-            --progress: {progress};
+            left: {s.x}%;
+            top: {s.y}%;
+            width: {s.size}px;
+            height: {s.size}px;
+            --delay: {s.delay}s;
           "
-          class:assembled={progress > 0.4}
-          class:launched={progress > 0.75}
         >
-          {#if i % 3 === 0}
-            <svg width="20" height="4" viewBox="0 0 20 4" fill="none">
-              <rect width="20" height="4" rx="2" fill="rgba(80,200,220,0.6)"/>
-            </svg>
-          {:else if i % 3 === 1}
-            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-              <circle cx="4" cy="4" r="3" stroke="rgba(100,180,255,0.5)" stroke-width="1"/>
-            </svg>
-          {:else}
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path d="M5 0L7 5L5 10L3 5Z" fill="rgba(144,96,192,0.5)"/>
-            </svg>
-          {/if}
+          {i % 3 === 0 ? '✦' : i % 3 === 1 ? '✧' : '✶'}
         </div>
       {/each}
+    </div>
 
-      <!-- Central logo mark -->
-      <div class="logo-mark" class:visible={progress > 0.3}>
-        <svg width="48" height="48" viewBox="0 0 32 32" fill="none">
-          <rect x="2" y="2" width="28" height="28" rx="6" stroke="rgba(80,200,220,0.5)" stroke-width="1.5"/>
-          <path d="M8 10L16 20L24 10" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="16" cy="24" r="1.5" fill="var(--color-accent)"/>
-        </svg>
+    <div class="assembly-container">
+      <div class="ufo-loader" class:launching={progress > 0.82}>
+        <div class="ufo-dome"></div>
+        <div class="ufo-base"></div>
+        <div class="ufo-lights"><span></span><span></span><span></span><span></span><span></span></div>
+      </div>
+      <div class="beam-loader" class:active={progress > 0.4}></div>
+      <div class="mascot" class:active={progress > 0.2}>
+        <div class="head"><span></span></div>
+        <div class="body"></div>
       </div>
     </div>
 
-    <!-- Status text -->
     <div class="status-area">
       <p class="status-message">{messages[phase]}</p>
+      <p class="status-brand">YUXBI CARTOON LAB</p>
       <div class="progress-bar">
         <div class="progress-fill" style="width: {progress * 100}%"></div>
       </div>
@@ -131,91 +109,211 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-12);
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    background:
+      radial-gradient(circle at 18% 16%, rgba(247, 109, 184, 0.2), transparent 26%),
+      radial-gradient(circle at 82% 20%, rgba(53, 104, 235, 0.18), transparent 24%),
+      radial-gradient(circle at 50% 85%, rgba(255, 199, 97, 0.3), transparent 36%),
+      var(--color-bg);
+  }
+
+  .cartoon-space {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .sparkle {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    color: var(--color-secondary);
+    opacity: 0.45;
+    animation: sparkleFloat 2.8s ease-in-out infinite;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes sparkleFloat {
+    0%, 100% { translate: 0 0; opacity: 0.35; }
+    50% { translate: 0 -8px; opacity: 0.95; }
   }
 
   .assembly-container {
     position: relative;
-    width: 280px;
-    height: 280px;
+    width: 320px;
+    height: 320px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
-  .fragment {
+  .ufo-loader {
     position: absolute;
+    top: 68px;
     left: 50%;
-    top: 50%;
-    transform:
-      translate(
-        calc(-50% + var(--start-x)),
-        calc(-50% + var(--start-y))
-      )
-      rotate(calc(var(--rotation) + 180deg))
-      scale(0.3);
-    opacity: 0;
-    animation: fragmentAssemble 1.2s cubic-bezier(0.16, 1, 0.3, 1) var(--delay) forwards;
+    width: 170px;
+    margin-left: -85px;
+    animation: loaderDrift 2.5s ease-in-out infinite;
+    z-index: 3;
   }
 
-  .fragment.assembled {
-    filter: drop-shadow(0 0 6px rgba(80, 200, 220, 0.3));
+  .ufo-loader.launching {
+    animation: loaderLaunch 0.7s ease-in both;
   }
 
-  .fragment.launched {
-    animation: fragmentLaunch 0.5s cubic-bezier(0.4, 0, 1, 1) forwards;
+  @keyframes loaderDrift {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -10px; }
   }
 
-  @keyframes fragmentAssemble {
-    0% {
-      transform:
-        translate(
-          calc(-50% + var(--start-x)),
-          calc(-50% + var(--start-y))
-        )
-        rotate(calc(var(--rotation) + 180deg))
-        scale(0.3);
-      opacity: 0;
-    }
-    100% {
-      transform:
-        translate(
-          calc(-50% + var(--target-x)),
-          calc(-50% + var(--target-y))
-        )
-        rotate(var(--rotation))
-        scale(var(--scale));
-      opacity: 1;
-    }
+  @keyframes loaderLaunch {
+    to { translate: 0 -120px; opacity: 0; }
   }
 
-  @keyframes fragmentLaunch {
-    0% {
-      opacity: 1;
-    }
-    100% {
-      transform:
-        translate(
-          calc(-50% + var(--target-x) * 3),
-          calc(-50% + var(--target-y) * 3 - 100px)
-        )
-        rotate(calc(var(--rotation) + 90deg))
-        scale(0.2);
-      opacity: 0;
-    }
+  .ufo-dome {
+    width: 92px;
+    height: 52px;
+    margin: 0 auto -8px;
+    border: 3px solid rgba(31, 47, 86, 0.45);
+    border-bottom: none;
+    border-radius: 999px 999px 0 0;
+    background: linear-gradient(180deg, rgba(133, 209, 255, 0.9), rgba(166, 232, 255, 0.56));
   }
 
-  .logo-mark {
+  .ufo-base {
+    width: 170px;
+    height: 58px;
+    border: 3px solid #1f2f56;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ffffff, #e9f1ff);
+    box-shadow: 0 9px 0 rgba(31, 47, 86, 0.16);
+  }
+
+  .ufo-lights {
+    margin-top: -14px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .ufo-lights span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #1f2f56;
+    background: #ffd46a;
+    animation: loaderBlink 1.2s ease-in-out infinite;
+  }
+
+  .ufo-lights span:nth-child(2) { animation-delay: -0.2s; }
+  .ufo-lights span:nth-child(3) { animation-delay: -0.4s; }
+  .ufo-lights span:nth-child(4) { animation-delay: -0.6s; }
+  .ufo-lights span:nth-child(5) { animation-delay: -0.8s; }
+
+  @keyframes loaderBlink {
+    0%, 100% { background: #ffd46a; }
+    50% { background: #f76db8; }
+  }
+
+  .beam-loader {
     position: absolute;
+    top: 144px;
+    left: 50%;
+    width: 220px;
+    height: 150px;
+    margin-left: -110px;
+    clip-path: polygon(38% 0%, 62% 0%, 100% 100%, 0% 100%);
+    background: linear-gradient(180deg, rgba(127, 190, 255, 0.32), rgba(127, 190, 255, 0));
     opacity: 0;
-    transform: scale(0.5);
-    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    filter: drop-shadow(0 0 20px rgba(80, 200, 220, 0.3));
+    transition: opacity 0.3s ease;
   }
 
-  .logo-mark.visible {
+  .beam-loader.active {
+    opacity: 1;
+    animation: beamWobble 1.6s ease-in-out infinite;
+  }
+
+  @keyframes beamWobble {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 0.45; }
+  }
+
+  .mascot {
+    position: absolute;
+    top: 204px;
+    left: 50%;
+    width: 60px;
+    margin-left: -30px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 0.2s ease, transform 0.25s var(--ease-elastic);
+  }
+
+  .mascot.active {
     opacity: 1;
     transform: scale(1);
+    animation: mascotBounce 1.1s ease-in-out infinite;
+  }
+
+  .head {
+    width: 52px;
+    height: 38px;
+    margin: 0 auto -6px;
+    border: 3px solid #1f2f56;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #89f084, #49d46b);
+    position: relative;
+  }
+
+  .head::before,
+  .head::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    width: 8px;
+    height: 11px;
+    border-radius: 999px;
+    background: #1f2f56;
+  }
+
+  .head::before { left: 14px; }
+  .head::after { right: 14px; }
+
+  .head span {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    width: 4px;
+    height: 12px;
+    margin-left: -2px;
+    border-radius: 999px;
+    background: #1f2f56;
+  }
+
+  .head span::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #1f2f56;
+    background: #ffd46a;
+  }
+
+  .body {
+    width: 38px;
+    height: 42px;
+    margin: 0 auto;
+    border: 3px solid #1f2f56;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #6de378, #36c45c);
+  }
+
+  @keyframes mascotBounce {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -5px; }
   }
 
   .status-area {
@@ -233,34 +331,47 @@
     text-transform: uppercase;
     min-height: 1.2em;
     transition: opacity 0.2s ease;
+    animation: statusHop 0.9s ease-in-out infinite;
+  }
+
+  .status-brand {
+    font-family: var(--font-display);
+    font-size: var(--text-sm);
+    color: var(--color-text-bright);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  @keyframes statusHop {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -3px; }
   }
 
   .progress-bar {
-    width: 160px;
-    height: 2px;
-    background: var(--color-border);
-    border-radius: 1px;
+    width: 220px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 999px;
+    border: 2px solid rgba(31, 47, 86, 0.18);
     overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(31, 47, 86, 0.06);
   }
 
   .progress-fill {
     height: 100%;
-    background: var(--color-accent);
-    border-radius: 1px;
+    background: linear-gradient(90deg, #f76db8, #3568eb 50%, #49d46b);
+    border-radius: 999px;
     transition: width 0.15s ease;
-    box-shadow: 0 0 8px rgba(80, 200, 220, 0.4);
+    box-shadow: 0 0 10px rgba(53, 104, 235, 0.35);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .fragment {
+    .sparkle,
+    .ufo-loader,
+    .beam-loader,
+    .mascot,
+    .status-message {
       animation: none !important;
-      opacity: 1;
-      transform: translate(calc(-50% + var(--target-x)), calc(-50% + var(--target-y)))
-                 rotate(var(--rotation)) scale(var(--scale));
-    }
-    .fragment.launched {
-      animation: none !important;
-      opacity: 0;
     }
   }
 </style>
