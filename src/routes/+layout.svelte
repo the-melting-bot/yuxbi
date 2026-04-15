@@ -9,55 +9,27 @@
 
   let { children }: Props = $props();
   let alienNightMode = $state(false);
-  let konamiProgress = 0;
-  let shutdownTimer: ReturnType<typeof setTimeout> | null = null;
+  let easterEggBurst = $state(false);
+  let easterEggTimer: ReturnType<typeof setTimeout> | null = null;
   const alienShips = [0, 1, 2];
+  const laserRows = [0, 1, 2, 3];
 
-  const konamiCode = [
-    'ArrowUp',
-    'ArrowUp',
-    'ArrowDown',
-    'ArrowDown',
-    'ArrowLeft',
-    'ArrowRight',
-    'ArrowLeft',
-    'ArrowRight',
-    'b',
-    'a'
-  ];
+  function triggerEasterEggBurst() {
+    easterEggBurst = true;
+    if (easterEggTimer) clearTimeout(easterEggTimer);
+    easterEggTimer = setTimeout(() => {
+      easterEggBurst = false;
+    }, 5200);
+  }
 
-  /*
-  ██████╗ ██╗   ██╗██╗██╗  ████████╗    ██████╗ ██╗   ██╗
-  ██╔══██╗██║   ██║██║██║  ╚══██╔══╝    ██╔══██╗╚██╗ ██╔╝
-  ██████╔╝██║   ██║██║██║     ██║       ██████╔╝ ╚████╔╝
-  ██╔══██╗██║   ██║██║██║     ██║       ██╔══██╗  ╚██╔╝
-  ██████╔╝╚██████╔╝██║███████╗██║       ██████╔╝   ██║
-  ╚═════╝  ╚═════╝ ╚═╝╚══════╝╚═╝       ╚═════╝    ╚═╝
-
-  ████████╗██╗  ██╗███████╗    ███╗   ███╗███████╗██╗  ████████╗██╗███╗   ██╗ ██████╗
-  ╚══██╔══╝██║  ██║██╔════╝    ████╗ ████║██╔════╝██║  ╚══██╔══╝██║████╗  ██║██╔════╝
-     ██║   ███████║█████╗      ██╔████╔██║█████╗  ██║     ██║   ██║██╔██╗ ██║██║  ███╗
-     ██║   ██╔══██║██╔══╝      ██║╚██╔╝██║██╔══╝  ██║     ██║   ██║██║╚██╗██║██║   ██║
-     ██║   ██║  ██║███████╗    ██║ ╚═╝ ██║███████╗███████╗██║   ██║██║ ╚████║╚██████╔╝
-     ╚═╝   ╚═╝  ╚═╝╚══════╝    ╚═╝     ╚═╝╚══════╝╚══════╝╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝
-
-  ██████╗  ██████╗ ████████╗
-  ██╔══██╗██╔═══██╗╚══██╔══╝
-  ██████╔╝██║   ██║   ██║
-  ██╔══██╗██║   ██║   ██║
-  ██████╔╝╚██████╔╝   ██║
-  ╚═════╝  ╚═════╝    ╚═╝
-
-  KONAMI CHEAT CODE:
-  ↑ ↑ ↓ ↓ ← → ← → B A
-  */
-
-  function activateAlienNightMode() {
-    alienNightMode = true;
-    if (shutdownTimer) clearTimeout(shutdownTimer);
-    shutdownTimer = setTimeout(() => {
-      alienNightMode = false;
-    }, 30000);
+  function toggleAlienNightMode() {
+    alienNightMode = !alienNightMode;
+    if (alienNightMode) {
+      triggerEasterEggBurst();
+    } else {
+      easterEggBurst = false;
+      if (easterEggTimer) clearTimeout(easterEggTimer);
+    }
   }
 
   $effect(() => {
@@ -69,35 +41,35 @@
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     });
-
-    function onKeydown(e: KeyboardEvent) {
-      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      if (key === konamiCode[konamiProgress]) {
-        konamiProgress += 1;
-        if (konamiProgress >= konamiCode.length) {
-          konamiProgress = 0;
-          activateAlienNightMode();
-        }
-      } else {
-        konamiProgress = key === konamiCode[0] ? 1 : 0;
-      }
-    }
-
-    window.addEventListener('keydown', onKeydown);
     return () => {
-      window.removeEventListener('keydown', onKeydown);
-      if (shutdownTimer) clearTimeout(shutdownTimer);
+      if (easterEggTimer) clearTimeout(easterEggTimer);
     };
   });
 </script>
 
 <LoadingScreen />
+<button
+  class="alien-mode-toggle"
+  onclick={toggleAlienNightMode}
+  aria-pressed={alienNightMode}
+  aria-label="Toggle alien night mode"
+>
+  {alienNightMode ? 'Disable Alien Night Mode' : 'Alien Night Mode'}
+</button>
 <div class="noise-overlay" aria-hidden="true"></div>
 <svelte:body class:alien-night-mode={alienNightMode} />
 
 {#if alienNightMode}
   <div class="alien-night-overlay" aria-hidden="true">
     <div class="night-label">ALIEN NIGHT MODE</div>
+    {#if easterEggBurst}
+      <div class="laser-stage">
+        {#each laserRows as row}
+          <span class="laser laser-{row + 1}"></span>
+        {/each}
+      </div>
+      <div class="flying-cow">🐄</div>
+    {/if}
     {#each alienShips as ship}
       <div class="flyover flyover-{ship + 1}">
         <div class="flyover-dome"></div>
@@ -111,6 +83,36 @@
 {@render children()}
 
 <style>
+  .alien-mode-toggle {
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10002;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 2px solid rgba(31, 47, 86, 0.2);
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-text-bright);
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 5px 0 rgba(31, 47, 86, 0.14);
+    transition: transform 0.22s var(--ease-elastic), background 0.2s ease;
+  }
+
+  .alien-mode-toggle:hover {
+    transform: translateX(-50%) translateY(-2px) rotate(-0.5deg);
+  }
+
+  :global(body.alien-night-mode) .alien-mode-toggle {
+    background: rgba(12, 22, 48, 0.9);
+    border-color: rgba(131, 197, 255, 0.4);
+    color: #e8f7ff;
+    box-shadow: 0 5px 0 rgba(4, 10, 24, 0.35);
+  }
+
   .alien-night-overlay {
     position: fixed;
     inset: 0;
@@ -133,6 +135,51 @@
     background: rgba(9, 20, 44, 0.6);
     padding: 6px 10px;
     animation: chipPulse 1.2s ease-in-out infinite;
+  }
+
+  .laser-stage {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
+  .laser {
+    position: absolute;
+    left: -20%;
+    width: 140%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #8ed9ff, #f76db8, transparent);
+    box-shadow: 0 0 12px rgba(142, 217, 255, 0.4);
+    animation: laserSweep 1.2s linear infinite;
+  }
+
+  .laser-1 { top: 22%; transform: rotate(-8deg); }
+  .laser-2 { top: 38%; transform: rotate(4deg); animation-delay: -0.25s; }
+  .laser-3 { top: 56%; transform: rotate(-5deg); animation-delay: -0.5s; }
+  .laser-4 { top: 74%; transform: rotate(7deg); animation-delay: -0.75s; }
+
+  @keyframes laserSweep {
+    0% { translate: -15% 0; opacity: 0.15; }
+    15% { opacity: 0.95; }
+    100% { translate: 20% 0; opacity: 0.1; }
+  }
+
+  .flying-cow {
+    position: absolute;
+    left: -90px;
+    top: 62%;
+    font-size: 3rem;
+    filter: drop-shadow(0 0 10px rgba(142, 217, 255, 0.4));
+    animation: cowFly 5s linear forwards;
+  }
+
+  @keyframes cowFly {
+    0% { translate: 0 0; rotate: -8deg; }
+    20% { translate: 22vw -24px; rotate: 8deg; }
+    50% { translate: 50vw -12px; rotate: -6deg; }
+    75% { translate: 75vw -28px; rotate: 6deg; }
+    100% { translate: calc(100vw + 160px) -16px; rotate: -4deg; }
   }
 
   @keyframes chipPulse {
