@@ -10,6 +10,12 @@
 
   let { experiment, index, onShelf, shelfCycle }: Props = $props();
 
+  function handleClick() {
+    if (experiment.href) {
+      window.location.href = experiment.href;
+    }
+  }
+
   const statusMap = {
     active: { label: 'Active', class: 'status-active' },
     pending: { label: 'Pending', class: 'status-pending' },
@@ -106,6 +112,7 @@
 
 <article
   class="experiment-card"
+  class:has-link={!!experiment.href}
   bind:this={cardEl}
   style="
     --index: {index};
@@ -119,7 +126,10 @@
   onmousemove={onMouseMove}
   onmouseenter={onMouseEnter}
   onmouseleave={onMouseLeave}
-  role="listitem"
+  onclick={handleClick}
+  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleClick(); }}
+  role={experiment.href ? 'link' : 'listitem'}
+  tabindex={experiment.href ? 0 : undefined}
 >
   <!-- Spotlight glow that follows cursor -->
   <div class="card-spotlight" aria-hidden="true"></div>
@@ -180,7 +190,7 @@
 
   <div class="card-footer">
     <span class="card-category">{experiment.category}</span>
-    <span class="card-arrow">→</span>
+    <span class="card-arrow">{experiment.href ? '→' : '⏳'}</span>
   </div>
 
   <div class="card-glow-line" aria-hidden="true"></div>

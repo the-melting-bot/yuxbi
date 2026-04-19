@@ -6,6 +6,7 @@ export interface Experiment {
   status: 'active' | 'pending' | 'classified';
   category: string;
   icon: 'lens' | 'radar' | 'ghost' | 'table' | 'orbit' | 'tone';
+  href?: string;
 }
 
 export const experiments: Experiment[] = [
@@ -16,7 +17,8 @@ export const experiments: Experiment[] = [
     description: 'Feed it a domain name. It tells you what the site should feel like before it exists.',
     status: 'active',
     category: 'interpretation',
-    icon: 'lens'
+    icon: 'lens',
+    href: '/experiments/drift-lens'
   },
   {
     id: 'exp-002',
