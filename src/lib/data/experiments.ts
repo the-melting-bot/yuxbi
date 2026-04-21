@@ -27,7 +27,8 @@ export const experiments: Experiment[] = [
     description: 'Paste any URL. Receive a full atmospheric reading of its design language.',
     status: 'active',
     category: 'analysis',
-    icon: 'radar'
+    icon: 'radar',
+    href: '/experiments/vibe-decode'
   },
   {
     id: 'exp-003',
