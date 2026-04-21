@@ -46,7 +46,8 @@ export const experiments: Experiment[] = [
     description: 'Drag data in one shape. It comes out another. No instructions needed.',
     status: 'active',
     category: 'transformation',
-    icon: 'table'
+    icon: 'table',
+    href: '/experiments/warp-table'
   },
   {
     id: 'exp-005',
