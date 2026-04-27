@@ -35,9 +35,10 @@ export const experiments: Experiment[] = [
     name: 'Ghost Prompt',
     codename: 'STATIC-03',
     description: 'A prompt scrubber that strips filler, sharpens intent, and returns the version you meant to write.',
-    status: 'pending',
+    status: 'active',
     category: 'language',
-    icon: 'ghost'
+    icon: 'ghost',
+    href: '/experiments/ghost-prompt'
   },
   {
     id: 'exp-004',
