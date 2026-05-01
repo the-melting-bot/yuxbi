@@ -55,9 +55,10 @@ export const experiments: Experiment[] = [
     name: 'Orbit Draft',
     codename: 'NOVA-11',
     description: 'Generates launch concepts from a single strange input. Name, tagline, landing structure — instant.',
-    status: 'classified',
+    status: 'active',
     category: 'generation',
-    icon: 'orbit'
+    icon: 'orbit',
+    href: '/experiments/orbit-draft'
   },
   {
     id: 'exp-006',
