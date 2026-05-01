@@ -65,8 +65,9 @@ export const experiments: Experiment[] = [
     name: 'Tone Field',
     codename: 'PULSE-09',
     description: 'Measures the emotional frequency of your brand copy. Returns a tone map, not a score.',
-    status: 'pending',
+    status: 'active',
     category: 'measurement',
-    icon: 'tone'
+    icon: 'tone',
+    href: '/experiments/tone-field'
   }
 ];
