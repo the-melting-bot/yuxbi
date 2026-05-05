@@ -3,6 +3,7 @@
   import type { Snippet } from 'svelte';
   import LoadingScreen from '$lib/components/LoadingScreen.svelte';
   import { signalBreach, BREACH_SEQUENCE } from '$lib/stores/signalBreach.svelte';
+  import Invaders from '$lib/components/Invaders.svelte';
 
   interface Props {
     children: Snippet;
@@ -12,6 +13,18 @@
 
   // Konami detector
   let progress = 0;
+
+  // Mini-game state
+  let arcadeOpen = $state(false);
+  let arcadePending = $state(false); // queued auto-launch after burst clears
+  const ARCADE_AUTO_KEY = 'yuxbi:invaders:auto-launched';
+
+  function openArcade() {
+    arcadeOpen = true;
+  }
+  function closeArcade() {
+    arcadeOpen = false;
+  }
 
   function keyToken(e: KeyboardEvent): string | null {
     switch (e.key) {
@@ -90,6 +103,33 @@
     };
   });
 
+  // Auto-launch arcade after unlock burst (once per session per fresh unlock).
+  // We watch for the burst going from true → false while unlocked.
+  $effect(() => {
+    if (signalBreach.unlocked && signalBreach.burst) {
+      // burst is showing — queue an auto-launch when it dismisses,
+      // but only if we haven't already auto-launched this session.
+      try {
+        if (sessionStorage.getItem(ARCADE_AUTO_KEY) !== '1') {
+          arcadePending = true;
+        }
+      } catch {
+        arcadePending = true;
+      }
+    } else if (signalBreach.unlocked && !signalBreach.burst && arcadePending) {
+      arcadePending = false;
+      try {
+        sessionStorage.setItem(ARCADE_AUTO_KEY, '1');
+      } catch {
+        /* ignore */
+      }
+      // Slight delay so the burst-fade-out is fully gone
+      setTimeout(() => {
+        arcadeOpen = true;
+      }, 220);
+    }
+  });
+
   $effect(() => {
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
@@ -100,6 +140,13 @@
   });
 
   function release() {
+    arcadeOpen = false;
+    arcadePending = false;
+    try {
+      sessionStorage.removeItem(ARCADE_AUTO_KEY);
+    } catch {
+      /* ignore */
+    }
     signalBreach.release();
   }
 
@@ -132,6 +179,23 @@
   <div class="breach-indicator" role="status">
     <span class="breach-dot" aria-hidden="true"></span>
     <span class="breach-indicator-label">Internal field active</span>
+    <button
+      class="breach-arcade"
+      onclick={openArcade}
+      aria-label="Launch arcade"
+      title="Launch arcade"
+      type="button"
+    >
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="2" y="4" width="3" height="3" fill="currentColor" />
+        <rect x="6" y="2" width="3" height="3" fill="currentColor" />
+        <rect x="10" y="4" width="3" height="3" fill="currentColor" />
+        <rect x="4" y="9" width="8" height="3" fill="currentColor" />
+        <rect x="3" y="12" width="2" height="2" fill="currentColor" />
+        <rect x="11" y="12" width="2" height="2" fill="currentColor" />
+      </svg>
+      <span class="breach-arcade-label">Arcade</span>
+    </button>
     <button
       class="breach-release"
       onclick={release}
@@ -172,6 +236,8 @@
 <div class="site-shell" class:signal-breach-root={signalBreach.unlocked}>
   {@render children()}
 </div>
+
+<Invaders open={arcadeOpen} onClose={closeArcade} />
 
 <style>
   /* ------------------------------------------------------------------
@@ -297,6 +363,32 @@
     color: var(--color-accent);
     border-color: rgba(53, 104, 235, 0.5);
   }
+
+  .breach-arcade {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 22px;
+    padding: 0 9px 0 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(53, 104, 235, 0.45);
+    background: rgba(53, 104, 235, 0.1);
+    color: var(--color-accent);
+    font-family: inherit;
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 4px;
+    transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  }
+  .breach-arcade:hover {
+    background: rgba(53, 104, 235, 0.18);
+    transform: translateY(-1px);
+    border-color: rgba(53, 104, 235, 0.7);
+  }
+  .breach-arcade svg { display: block; }
 
   /* Unlock burst */
   .breach-burst {
@@ -461,6 +553,14 @@
       right: 14px;
       font-size: 0.58rem;
       padding: 6px 8px 6px 10px;
+    }
+    .breach-arcade {
+      height: 20px;
+      padding: 0 8px;
+      font-size: 0.55rem;
+    }
+    .breach-arcade-label {
+      /* keep label — the icon helps but text is clearer */
     }
   }
 </style>
