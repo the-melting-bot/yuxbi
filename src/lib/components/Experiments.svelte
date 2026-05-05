@@ -1,10 +1,15 @@
 <script lang="ts">
   import { experiments } from '$lib/data/experiments';
   import ExperimentCard from './ExperimentCard.svelte';
+  import { signalBreach } from '$lib/stores/signalBreach.svelte';
 
   let sectionEl: HTMLElement;
   let visible = $state(false);
   let shelfCycle = $state(0);
+
+  let visibleExperiments = $derived(
+    experiments.filter((e) => !e.hidden || signalBreach.unlocked)
+  );
 
   $effect(() => {
     const observer = new IntersectionObserver(
@@ -37,7 +42,7 @@
     <div class="shelf-wrap" class:visible>
       <div class="shelf-rail shelf-rail-top" aria-hidden="true"></div>
       <div class="experiments-grid" role="list">
-      {#each experiments as experiment, i}
+      {#each visibleExperiments as experiment, i (experiment.id)}
         <ExperimentCard {experiment} index={i} onShelf={visible} shelfCycle={shelfCycle} />
       {/each}
       </div>

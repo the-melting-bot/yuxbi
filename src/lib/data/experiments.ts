@@ -7,9 +7,21 @@ export interface Experiment {
   category: string;
   icon: 'lens' | 'radar' | 'ghost' | 'table' | 'orbit' | 'tone';
   href?: string;
+  /** Hidden cards are filtered out unless Signal Breach is unlocked. */
+  hidden?: boolean;
 }
 
 export const experiments: Experiment[] = [
+  {
+    id: 'exp-000',
+    name: 'Black Shelf',
+    codename: 'SIGNAL-00',
+    description: 'Sealed transmission. Internal object detected. The catalog refuses it. The shelf does not.',
+    status: 'classified',
+    category: 'archive',
+    icon: 'radar',
+    hidden: true
+  },
   {
     id: 'exp-001',
     name: 'Drift Lens',

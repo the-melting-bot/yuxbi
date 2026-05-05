@@ -1,20 +1,20 @@
 <script lang="ts">
-  const cheatCode = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a'] as const;
+  import { signalBreach, BREACH_SEQUENCE } from '$lib/stores/signalBreach.svelte';
   let progress = $state(0);
-  let unlocked = $state(false);
+  let justUnlocked = $state(false);
 
   function pressCheat(btn: 'up' | 'down' | 'left' | 'right' | 'b' | 'a') {
-    if (btn === cheatCode[progress]) {
+    if (btn === BREACH_SEQUENCE[progress]) {
       progress += 1;
-      if (progress >= cheatCode.length) {
+      if (progress >= BREACH_SEQUENCE.length) {
         progress = 0;
-        unlocked = true;
-        window.dispatchEvent(new CustomEvent('yuxbi:alien-cheat'));
-        setTimeout(() => { unlocked = false; }, 2200);
+        justUnlocked = true;
+        signalBreach.activate();
+        setTimeout(() => { justUnlocked = false; }, 2400);
       }
       return;
     }
-    progress = btn === cheatCode[0] ? 1 : 0;
+    progress = btn === BREACH_SEQUENCE[0] ? 1 : 0;
   }
 </script>
 
@@ -50,7 +50,7 @@
     </div>
 
     <div class="footer-bottom">
-      <div class="cheat-console" role="group" aria-label="Alien mode cheat controller">
+      <div class="cheat-console" role="group" aria-label="Yuxbi cheat code controller">
         <p class="cheat-title">Enter Yuxbi Cheat Code</p>
         <div class="controller-row">
           <div class="dpad">
@@ -66,12 +66,14 @@
         </div>
         <div class="cheat-status">
           <div class="progress-dots" aria-hidden="true">
-            {#each Array(cheatCode.length) as _, i}
+            {#each Array(BREACH_SEQUENCE.length) as _, i}
               <span class:active={i < progress}></span>
             {/each}
           </div>
-          {#if unlocked}
-            <span class="unlocked">ALIEN MODE ACTIVATED</span>
+          {#if justUnlocked}
+            <span class="unlocked">Sequence accepted</span>
+          {:else if signalBreach.unlocked}
+            <span class="unlocked">Hidden layer open</span>
           {:else}
             <span>Sequence in progress</span>
           {/if}
@@ -79,6 +81,7 @@
       </div>
 
       <div class="footer-right">
+        <span class="breach-whisper" aria-live="polite">The lab remembers you.</span>
         <a href="https://themeltingbot.com" class="tmb-pill" target="_blank" rel="noopener noreferrer" aria-label="Built by The Melting Bot">
           <svg class="tmb-pill-icon" width="18" height="20" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <line x1="12" y1="3" x2="12" y2="0" stroke="#7B61FF" stroke-width="2" stroke-linecap="round"/>
@@ -332,6 +335,22 @@
 
   .tmb-pill-icon {
     flex-shrink: 0;
+  }
+
+  :global(.breach-whisper) {
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    opacity: 0.75;
+    font-style: italic;
+    /* Hidden by default; revealed via :global(body.signal-breach) in +layout.svelte */
+    display: none;
+  }
+
+  :global(body.signal-breach .breach-whisper) {
+    display: inline-block;
   }
 
   @media (max-width: 640px) {

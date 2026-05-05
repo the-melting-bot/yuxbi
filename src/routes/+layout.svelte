@@ -2,305 +2,465 @@
   import '$lib/styles/global.css';
   import type { Snippet } from 'svelte';
   import LoadingScreen from '$lib/components/LoadingScreen.svelte';
+  import { signalBreach, BREACH_SEQUENCE } from '$lib/stores/signalBreach.svelte';
 
   interface Props {
     children: Snippet;
   }
 
   let { children }: Props = $props();
-  let alienNightMode = $state(false);
-  let easterEggBurst = $state(false);
-  let showAlienToggle = $state(false);
-  let easterEggTimer: ReturnType<typeof setTimeout> | null = null;
-  let toggleRevealTimer: ReturnType<typeof setTimeout> | null = null;
-  const alienShips = [0, 1, 2];
-  const laserRows = [0, 1, 2, 3];
 
-  function triggerEasterEggBurst() {
-    easterEggBurst = true;
-    if (easterEggTimer) clearTimeout(easterEggTimer);
-    easterEggTimer = setTimeout(() => {
-      easterEggBurst = false;
-    }, 5200);
+  // Konami detector
+  let progress = 0;
+
+  function keyToken(e: KeyboardEvent): string | null {
+    switch (e.key) {
+      case 'ArrowUp':
+        return 'up';
+      case 'ArrowDown':
+        return 'down';
+      case 'ArrowLeft':
+        return 'left';
+      case 'ArrowRight':
+        return 'right';
+      case 'b':
+      case 'B':
+        return 'b';
+      case 'a':
+      case 'A':
+        return 'a';
+      default:
+        return null;
+    }
   }
 
-  function toggleAlienNightMode() {
-    alienNightMode = !alienNightMode;
-    if (alienNightMode) {
-      triggerEasterEggBurst();
+  function isTypingTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    const tag = target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    if (target.isContentEditable) return true;
+    return false;
+  }
+
+  function onKeyDown(e: KeyboardEvent) {
+    if (signalBreach.unlocked) return; // already in
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (isTypingTarget(e.target)) return;
+
+    const token = keyToken(e);
+    if (!token) {
+      if (progress > 0) progress = 0;
+      return;
+    }
+
+    if (token === BREACH_SEQUENCE[progress]) {
+      progress += 1;
+      if (progress >= BREACH_SEQUENCE.length) {
+        progress = 0;
+        signalBreach.activate();
+      }
     } else {
-      easterEggBurst = false;
-      if (easterEggTimer) clearTimeout(easterEggTimer);
+      // mismatch — reset, but if this key is the start of the sequence, count it
+      progress = token === BREACH_SEQUENCE[0] ? 1 : 0;
     }
-  }
-
-  function activateFromCheatController() {
-    if (!alienNightMode) {
-      alienNightMode = true;
-    }
-    triggerEasterEggBurst();
   }
 
   $effect(() => {
-    alienNightMode;
-    document.body.classList.toggle('alien-night-mode', alienNightMode);
+    signalBreach.hydrate();
+    document.body.classList.toggle('signal-breach', signalBreach.unlocked);
     return () => {
-      document.body.classList.remove('alien-night-mode');
+      document.body.classList.remove('signal-breach');
     };
   });
 
   $effect(() => {
-    function onCheatTrigger() {
-      activateFromCheatController();
+    function onLegacyCheat() {
+      signalBreach.activate();
     }
-    window.addEventListener('yuxbi:alien-cheat', onCheatTrigger);
-    return () => window.removeEventListener('yuxbi:alien-cheat', onCheatTrigger);
+    function onBreach() {
+      signalBreach.activate();
+    }
+    window.addEventListener('yuxbi:alien-cheat', onLegacyCheat);
+    window.addEventListener('yuxbi:signal-breach-trigger', onBreach);
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('yuxbi:alien-cheat', onLegacyCheat);
+      window.removeEventListener('yuxbi:signal-breach-trigger', onBreach);
+      window.removeEventListener('keydown', onKeyDown);
+    };
   });
 
   $effect(() => {
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
-
-    // Ensure refresh always re-enters from top.
     requestAnimationFrame(() => {
       window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     });
-
-    // Match loading sequence duration so toggle appears after intro.
-    toggleRevealTimer = setTimeout(() => {
-      showAlienToggle = true;
-    }, 4600);
-
-    return () => {
-      if (easterEggTimer) clearTimeout(easterEggTimer);
-      if (toggleRevealTimer) clearTimeout(toggleRevealTimer);
-    };
   });
+
+  function release() {
+    signalBreach.release();
+  }
+
+  function dismissBurst() {
+    signalBreach.dismissBurst();
+  }
 </script>
 
 <LoadingScreen />
-{#if showAlienToggle}
-  <button
-    class="alien-mode-toggle"
-    onclick={toggleAlienNightMode}
-    aria-pressed={alienNightMode}
-    aria-label="Toggle alien night mode"
-  >
-    {alienNightMode ? 'Disable Alien Night Mode' : 'Alien Night Mode'}
-  </button>
-{/if}
+
 <div class="noise-overlay" aria-hidden="true"></div>
 
-{#if alienNightMode}
-  <div class="alien-night-overlay" aria-hidden="true">
-    <div class="night-label">ALIEN NIGHT MODE</div>
-    {#if easterEggBurst}
-      <div class="laser-stage">
-        {#each laserRows as row}
-          <span class="laser laser-{row + 1}"></span>
-        {/each}
-      </div>
-      <div class="flying-cow">🐄</div>
-    {/if}
-    {#each alienShips as ship}
-      <div class="flyover flyover-{ship + 1}">
-        <div class="flyover-dome"></div>
-        <div class="flyover-base"></div>
-        <div class="flyover-lights"><span></span><span></span><span></span></div>
-      </div>
-    {/each}
+<!-- Sitewide signal-wave overlay (subtle, only in unlocked mode) -->
+{#if signalBreach.unlocked}
+  <div class="breach-field" aria-hidden="true">
+    <svg class="breach-waves" viewBox="0 0 1440 900" preserveAspectRatio="none" fill="none">
+      <path class="wave wave-1"
+        d="M0 220 Q 240 180 480 220 T 960 220 T 1440 220"
+        stroke="currentColor" stroke-width="1.2" fill="none" />
+      <path class="wave wave-2"
+        d="M0 460 Q 240 420 480 460 T 960 460 T 1440 460"
+        stroke="currentColor" stroke-width="1.2" fill="none" />
+      <path class="wave wave-3"
+        d="M0 700 Q 240 660 480 700 T 960 700 T 1440 700"
+        stroke="currentColor" stroke-width="1.2" fill="none" />
+    </svg>
+    <div class="breach-grid"></div>
+  </div>
+
+  <div class="breach-indicator" role="status">
+    <span class="breach-dot" aria-hidden="true"></span>
+    <span class="breach-indicator-label">Internal field active</span>
+    <button
+      class="breach-release"
+      onclick={release}
+      aria-label="Release signal breach"
+      title="Release"
+    >
+      ×
+    </button>
   </div>
 {/if}
 
-<div class="site-shell" class:alien-night-mode-root={alienNightMode}>
+<!-- Unlock burst overlay -->
+{#if signalBreach.burst}
+  <div
+    class="breach-burst"
+    role="status"
+    aria-live="polite"
+    onclick={dismissBurst}
+    onkeydown={(e) => { if (e.key === 'Escape') dismissBurst(); }}
+    tabindex="-1"
+  >
+    <div class="breach-scan" aria-hidden="true"></div>
+    <div class="breach-burst-center">
+      <div class="breach-burst-mark" aria-hidden="true">
+        <svg viewBox="0 0 80 80" fill="none">
+          <circle cx="40" cy="40" r="30" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 5" />
+          <circle cx="40" cy="40" r="18" stroke="currentColor" stroke-width="1.5" />
+          <circle cx="40" cy="40" r="3" fill="currentColor" />
+        </svg>
+      </div>
+      <div class="breach-burst-label">Signal Breach</div>
+      <div class="breach-burst-message">{signalBreach.message}</div>
+      <div class="breach-burst-meta">Sequence verified · session continuity established</div>
+    </div>
+  </div>
+{/if}
+
+<div class="site-shell" class:signal-breach-root={signalBreach.unlocked}>
   {@render children()}
 </div>
 
 <style>
-  .alien-mode-toggle {
+  /* ------------------------------------------------------------------
+   * Signal Breach — alternate lab visuals
+   * Activated when body.signal-breach is set.
+   * Subtle, cinematic, deliberate. Respects prefers-reduced-motion.
+   * ------------------------------------------------------------------ */
+
+  .breach-field {
     position: fixed;
-    top: 14px;
-    left: 50%;
-    transform: translateX(-50%);
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    color: rgba(53, 104, 235, 0.22);
+    opacity: 0;
+    animation: breachFadeIn 1.4s ease-out 0.2s forwards;
+  }
+
+  .breach-waves {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .wave {
+    opacity: 0.55;
+    stroke-dasharray: 4 8;
+  }
+
+  .wave-1 { animation: waveDrift 18s linear infinite; }
+  .wave-2 { animation: waveDrift 24s linear infinite reverse; opacity: 0.4; }
+  .wave-3 { animation: waveDrift 30s linear infinite; opacity: 0.3; }
+
+  @keyframes waveDrift {
+    from { stroke-dashoffset: 0; }
+    to { stroke-dashoffset: -240; }
+  }
+
+  .breach-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(53, 104, 235, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(53, 104, 235, 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+
+  @keyframes breachFadeIn {
+    to { opacity: 1; }
+  }
+
+  /* Corner indicator — bottom-right to stay clear of nav at top */
+  .breach-indicator {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
     z-index: 10002;
-    padding: 8px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px 7px 12px;
     border-radius: 999px;
-    border: 2px solid rgba(31, 47, 86, 0.2);
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--color-text-bright);
+    border: 1px solid rgba(53, 104, 235, 0.35);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 0 rgba(31, 47, 86, 0.12);
     font-family: var(--font-display);
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    box-shadow: 0 5px 0 rgba(31, 47, 86, 0.14);
-    transition: transform 0.22s var(--ease-elastic), background 0.2s ease;
+    color: var(--color-accent);
+    animation: indicatorIn 0.55s var(--ease-elastic) both;
+    animation-delay: 0.2s;
   }
 
-  .alien-mode-toggle:hover {
-    transform: translateX(-50%) translateY(-2px) rotate(-0.5deg);
+  @keyframes indicatorIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  :global(body.alien-night-mode) .alien-mode-toggle {
-    background: rgba(12, 22, 48, 0.9);
-    border-color: rgba(131, 197, 255, 0.4);
-    color: #e8f7ff;
-    box-shadow: 0 5px 0 rgba(4, 10, 24, 0.35);
-  }
-
-  .alien-night-overlay {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 10001;
-    overflow: hidden;
-  }
-
-  .night-label {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    font-family: var(--font-display);
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #e3f5ff;
-    border: 2px solid rgba(227, 245, 255, 0.3);
-    border-radius: 999px;
-    background: rgba(9, 20, 44, 0.6);
-    padding: 6px 10px;
-    animation: chipPulse 1.2s ease-in-out infinite;
-  }
-
-  .laser-stage {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.8;
-  }
-
-  .laser {
-    position: absolute;
-    left: -20%;
-    width: 140%;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, #8ed9ff, #f76db8, transparent);
-    box-shadow: 0 0 12px rgba(142, 217, 255, 0.4);
-    animation: laserSweep 1.2s linear infinite;
-  }
-
-  .laser-1 { top: 22%; transform: rotate(-8deg); }
-  .laser-2 { top: 38%; transform: rotate(4deg); animation-delay: -0.25s; }
-  .laser-3 { top: 56%; transform: rotate(-5deg); animation-delay: -0.5s; }
-  .laser-4 { top: 74%; transform: rotate(7deg); animation-delay: -0.75s; }
-
-  @keyframes laserSweep {
-    0% { translate: -15% 0; opacity: 0.15; }
-    15% { opacity: 0.95; }
-    100% { translate: 20% 0; opacity: 0.1; }
-  }
-
-  .flying-cow {
-    position: absolute;
-    left: -90px;
-    top: 62%;
-    font-size: 3rem;
-    filter: drop-shadow(0 0 10px rgba(142, 217, 255, 0.4));
-    animation: cowFly 5s linear forwards;
-  }
-
-  @keyframes cowFly {
-    0% { translate: 0 0; rotate: -8deg; }
-    20% { translate: 22vw -24px; rotate: 8deg; }
-    50% { translate: 50vw -12px; rotate: -6deg; }
-    75% { translate: 75vw -28px; rotate: 6deg; }
-    100% { translate: calc(100vw + 160px) -16px; rotate: -4deg; }
-  }
-
-  @keyframes chipPulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
-  }
-
-  .flyover {
-    position: absolute;
-    width: 118px;
-    opacity: 0.9;
-    filter: drop-shadow(0 0 14px rgba(131, 197, 255, 0.42));
-  }
-
-  .flyover-1 {
-    top: 16%;
-    left: -140px;
-    animation: flyAcrossA 12s linear infinite;
-  }
-
-  .flyover-2 {
-    top: 44%;
-    left: -140px;
-    transform: scale(0.85);
-    animation: flyAcrossB 15s linear infinite;
-    animation-delay: -4s;
-  }
-
-  .flyover-3 {
-    top: 72%;
-    left: -140px;
-    transform: scale(0.7);
-    animation: flyAcrossA 11s linear infinite reverse;
-    animation-delay: -6s;
-  }
-
-  .flyover-dome {
-    width: 58px;
-    height: 30px;
-    margin: 0 auto -6px;
-    border: 2px solid rgba(182, 234, 255, 0.9);
-    border-bottom: none;
-    border-radius: 999px 999px 0 0;
-    background: linear-gradient(180deg, rgba(126, 212, 255, 0.76), rgba(126, 212, 255, 0.25));
-  }
-
-  .flyover-base {
-    width: 118px;
-    height: 36px;
-    border: 2px solid rgba(182, 234, 255, 0.9);
-    border-radius: 999px;
-    background: linear-gradient(180deg, rgba(19, 41, 84, 0.95), rgba(37, 75, 132, 0.85));
-  }
-
-  .flyover-lights {
-    margin-top: -9px;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-
-  .flyover-lights span {
+  .breach-dot {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    border: 1px solid rgba(182, 234, 255, 0.85);
-    background: #ffd46a;
-    animation: shipBlink 0.9s ease-in-out infinite;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 0 rgba(53, 104, 235, 0.6);
+    animation: breachPulse 1.6s ease-in-out infinite;
   }
 
-  .flyover-lights span:nth-child(2) { animation-delay: -0.25s; }
-  .flyover-lights span:nth-child(3) { animation-delay: -0.5s; }
-
-  @keyframes shipBlink {
-    0%, 100% { background: #ffd46a; }
-    50% { background: #f76db8; }
+  @keyframes breachPulse {
+    0% { box-shadow: 0 0 0 0 rgba(53, 104, 235, 0.55); }
+    70% { box-shadow: 0 0 0 10px rgba(53, 104, 235, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(53, 104, 235, 0); }
   }
 
-  @keyframes flyAcrossA {
-    from { translate: 0 0; }
-    to { translate: calc(100vw + 280px) 0; }
+  .breach-indicator-label {
+    font-weight: 600;
   }
 
-  @keyframes flyAcrossB {
-    0% { translate: 0 0; }
-    50% { translate: calc(50vw + 120px) -25px; }
-    100% { translate: calc(100vw + 280px) 0; }
+  .breach-release {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(31, 47, 86, 0.22);
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    margin-left: 2px;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .breach-release:hover {
+    background: rgba(53, 104, 235, 0.1);
+    color: var(--color-accent);
+    border-color: rgba(53, 104, 235, 0.5);
+  }
+
+  /* Unlock burst */
+  .breach-burst {
+    position: fixed;
+    inset: 0;
+    z-index: 10100;
+    background: radial-gradient(ellipse at center, rgba(13, 21, 46, 0.78) 0%, rgba(13, 21, 46, 0.92) 100%);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    color: #e8efff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    overflow: hidden;
+    animation: burstFade 2.4s ease-out forwards;
+  }
+
+  @keyframes burstFade {
+    0% { opacity: 0; }
+    8% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .breach-scan {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(142, 217, 255, 0.85), transparent);
+    box-shadow: 0 0 24px rgba(142, 217, 255, 0.55);
+    top: 0;
+    animation: breachScan 2.0s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+  }
+
+  @keyframes breachScan {
+    0% { top: 0; opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { top: 100%; opacity: 0.4; }
+  }
+
+  .breach-burst-center {
+    text-align: center;
+    transform: translateY(-12px);
+    animation: burstCenterIn 0.7s var(--ease-out) 0.15s both;
+  }
+
+  @keyframes burstCenterIn {
+    from { opacity: 0; transform: translateY(-4px) scale(0.96); }
+    to { opacity: 1; transform: translateY(-12px) scale(1); }
+  }
+
+  .breach-burst-mark {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto var(--space-4);
+    color: #8ed9ff;
+    animation: markSpin 7s linear infinite;
+  }
+
+  .breach-burst-mark svg { width: 100%; height: 100%; }
+
+  @keyframes markSpin {
+    from { transform: rotate(0); }
+    to { transform: rotate(360deg); }
+  }
+
+  .breach-burst-label {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(232, 239, 255, 0.7);
+    margin-bottom: var(--space-3);
+  }
+
+  .breach-burst-message {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3.4vw, 2rem);
+    font-weight: 500;
+    color: #ffffff;
+    letter-spacing: 0.01em;
+    margin-bottom: var(--space-3);
+  }
+
+  .breach-burst-meta {
+    font-family: var(--font-display);
+    font-size: 0.64rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(232, 239, 255, 0.45);
+  }
+
+  /* ------------------------------------------------------------------
+   * Sitewide effects when body.signal-breach is active.
+   * Use :global() to reach beyond layout scope.
+   * ------------------------------------------------------------------ */
+
+  /* Subtle background tint */
+  :global(body.signal-breach) {
+    background: linear-gradient(180deg, #f7f9ff 0%, #fff5de 100%);
+  }
+
+  /* Soft levitation of cards */
+  :global(body.signal-breach .experiment-card) {
+    animation: breachLevitate calc(7s + var(--index, 0) * 0.4s) ease-in-out infinite !important;
+    animation-delay: calc(var(--index, 0) * -0.6s) !important;
+    border-color: rgba(53, 104, 235, 0.28) !important;
+    box-shadow: 0 6px 0 rgba(31, 47, 86, 0.12), 0 0 24px rgba(53, 104, 235, 0.08) !important;
+  }
+
+  :global(body.signal-breach .experiment-card.hovered) {
+    animation-play-state: paused !important;
+  }
+
+  @keyframes breachLevitate {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -8px; }
+  }
+
+  /* Soft accent glow on hero badge in breach mode */
+  :global(body.signal-breach .hero-badge) {
+    border-color: rgba(53, 104, 235, 0.4) !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+  }
+
+  /* Reveal hidden footer microcopy in breach mode */
+  :global(.breach-whisper) {
+    display: none;
+  }
+
+  :global(body.signal-breach .breach-whisper) {
+    display: inline-block;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .wave-1, .wave-2, .wave-3,
+    .breach-dot,
+    .breach-burst-mark,
+    .breach-scan {
+      animation: none !important;
+    }
+    :global(body.signal-breach .experiment-card) {
+      animation: none !important;
+    }
+    .breach-burst {
+      animation: burstFadeReduced 2.4s ease-out forwards;
+    }
+  }
+
+  @keyframes burstFadeReduced {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  @media (max-width: 640px) {
+    .breach-indicator {
+      bottom: 14px;
+      right: 14px;
+      font-size: 0.58rem;
+      padding: 6px 8px 6px 10px;
+    }
   }
 </style>

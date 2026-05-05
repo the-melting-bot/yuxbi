@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Experiment } from '$lib/data/experiments';
+  import { signalBreach, BREACH_STATUS_MAP } from '$lib/stores/signalBreach.svelte';
 
   interface Props {
     experiment: Experiment;
@@ -23,6 +24,11 @@
   } as const;
 
   let status = $derived(statusMap[experiment.status]);
+  let statusLabel = $derived(
+    signalBreach.unlocked
+      ? (BREACH_STATUS_MAP[status.label] ?? status.label)
+      : status.label
+  );
 
   // Tilt physics state
   let cardEl: HTMLElement;
@@ -138,7 +144,7 @@
     <span class="card-codename">{experiment.codename}</span>
     <span class="card-status {status.class}">
       <span class="status-dot"></span>
-      {status.label}
+      {statusLabel}
     </span>
   </div>
 

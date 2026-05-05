@@ -1,6 +1,7 @@
 <script lang="ts">
   import HeroCanvas from './HeroCanvas.svelte';
   import { getCursor, initCursorTracking } from '$lib/motion/cursor';
+  import { signalBreach } from '$lib/stores/signalBreach.svelte';
 
   let visible = $state(false);
   let heroEl: HTMLElement;
@@ -70,7 +71,7 @@
   <div class="hero-content container" class:visible style="transform: translate({offsetX * 0.5}px, {offsetY * 0.3}px)">
     <div class="hero-badge">
       <span class="badge-dot"></span>
-      <span class="badge-text">Laboratory active</span>
+      <span class="badge-text">{signalBreach.unlocked ? 'Internal field active' : 'Laboratory active'}</span>
     </div>
 
     <h1 class="hero-headline">
