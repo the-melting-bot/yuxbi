@@ -5,6 +5,8 @@
    * Retro CRT phosphor aesthetic. Keyboard + touch controls.
    */
 
+  import { untrack } from 'svelte';
+
   interface Props {
     open: boolean;
     onClose: () => void;
@@ -450,39 +452,45 @@
 
   // ---- Lifecycle --------------------------------------------------------
   $effect(() => {
-    if (!open) {
+    // Only react to `open` transitioning. Game-internal $state (wave, score,
+    // lives, etc.) is mutated by the loop and must NOT re-trigger this effect,
+    // or every wave-clear would re-run resetGame and pin wave at 1.
+    const isOpen = open;
+    if (!isOpen) {
       cancelAnimationFrame(rafId);
       lastTs = 0;
       return;
     }
 
-    // Restore high score
-    try {
-      const saved = localStorage.getItem('yuxbi:invaders:hi');
-      if (saved) highScore = parseInt(saved, 10) || 0;
-    } catch {
-      /* ignore */
-    }
+    return untrack(() => {
+      // Restore high score
+      try {
+        const saved = localStorage.getItem('yuxbi:invaders:hi');
+        if (saved) highScore = parseInt(saved, 10) || 0;
+      } catch {
+        /* ignore */
+      }
 
-    // Pixelated rendering
-    if (canvasEl) {
-      canvasEl.width = W;
-      canvasEl.height = H;
-      const ctx = canvasEl.getContext('2d');
-      if (ctx) ctx.imageSmoothingEnabled = false;
-    }
+      // Pixelated rendering
+      if (canvasEl) {
+        canvasEl.width = W;
+        canvasEl.height = H;
+        const ctx = canvasEl.getContext('2d');
+        if (ctx) ctx.imageSmoothingEnabled = false;
+      }
 
-    resetGame();
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
-    rafId = requestAnimationFrame(loop);
+      resetGame();
+      window.addEventListener('keydown', onKeyDown);
+      window.addEventListener('keyup', onKeyUp);
+      rafId = requestAnimationFrame(loop);
 
-    return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
-      lastTs = 0;
-    };
+      return () => {
+        cancelAnimationFrame(rafId);
+        window.removeEventListener('keydown', onKeyDown);
+        window.removeEventListener('keyup', onKeyUp);
+        lastTs = 0;
+      };
+    });
   });
 
   // ---- Touch handlers ---------------------------------------------------
