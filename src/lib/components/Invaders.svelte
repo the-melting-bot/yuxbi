@@ -106,7 +106,9 @@
     alienDir = 1;
     alienStepTimer = 0;
     alienShootTimer = 0;
-    alienBaseStep = Math.max(0.18, 0.7 - (currentWave - 1) * 0.08);
+    // Difficulty curve: Wave 1 forgiving, Wave 5 punishing.
+    // Step time = how long aliens wait between moves (lower = faster).
+    alienBaseStep = Math.max(0.14, 0.85 - (currentWave - 1) * 0.13);
     alienStep = alienBaseStep;
   }
 
@@ -190,7 +192,7 @@
     const aliveAliens = aliens.filter((a) => a.alive);
     // Speed up as aliens are killed
     const remainingFactor = aliveAliens.length / (ROWS * COLS);
-    alienStep = Math.max(0.08, alienBaseStep * (0.4 + remainingFactor * 0.8));
+    alienStep = Math.max(0.06, alienBaseStep * (0.4 + remainingFactor * 0.8));
 
     if (alienStepTimer >= alienStep) {
       alienStepTimer = 0;
@@ -222,9 +224,10 @@
       }
     }
 
-    // Alien shooting
+    // Alien shooting — interval shrinks with wave + as aliens are killed.
+    // Wave 4+ can fire double-shot bursts. Wave 5 bullets are faster.
     alienShootTimer += dt;
-    const shootInterval = Math.max(0.45, 1.4 - wave * 0.08 - (1 - remainingFactor) * 0.4);
+    const shootInterval = Math.max(0.28, 1.5 - wave * 0.16 - (1 - remainingFactor) * 0.45);
     if (alienShootTimer >= shootInterval && aliveAliens.length > 0) {
       alienShootTimer = 0;
       // Pick the lowest alien in a random column
@@ -234,14 +237,27 @@
         if (!cur || a.y > cur.y) cols.set(a.col, a);
       }
       const shooters = [...cols.values()];
-      const shooter = shooters[Math.floor(Math.random() * shooters.length)];
-      bullets.push({
-        x: shooter.x + ALIEN_W / 2,
-        y: shooter.y + ALIEN_H,
-        vy: 220 + wave * 12,
-        alive: true,
-        from: 'alien'
-      });
+      // From wave 4 on, occasionally fire two bullets at once.
+      const burstChance = wave >= 5 ? 0.55 : wave >= 4 ? 0.3 : 0;
+      const shotCount = burstChance > 0 && Math.random() < burstChance ? 2 : 1;
+      const bulletSpeed = 220 + wave * 22;
+      const used = new Set<number>();
+      for (let s = 0; s < shotCount && shooters.length > used.size; s++) {
+        let shooter: Alien;
+        let attempts = 0;
+        do {
+          shooter = shooters[Math.floor(Math.random() * shooters.length)];
+          attempts++;
+        } while (used.has(shooter.col) && attempts < 8);
+        used.add(shooter.col);
+        bullets.push({
+          x: shooter.x + ALIEN_W / 2,
+          y: shooter.y + ALIEN_H,
+          vy: bulletSpeed,
+          alive: true,
+          from: 'alien'
+        });
+      }
     }
 
     // Collisions: player bullets vs aliens
@@ -292,7 +308,7 @@
 
     // Wave clear
     if (aliveAliens.length === 0) {
-      if (wave >= 3) {
+      if (wave >= 5) {
         endGame(true);
       } else {
         nextWave();
@@ -508,7 +524,7 @@
         </div>
         <div class="hud-mid">
           <span class="hud-label">Wave</span>
-          <span class="hud-value">{wave} / 3</span>
+          <span class="hud-value">{wave} / 5</span>
         </div>
         <div class="hud-right">
           <span class="hud-label">Hi</span>
@@ -534,7 +550,7 @@
               {:else if status === 'lost'}
                 Final score · {score}
               {:else}
-                Three waves. Don't let them land.
+                Five waves. They get faster. Don't let them land.
               {/if}
             </div>
             <div class="banner-actions">
